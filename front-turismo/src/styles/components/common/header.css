@@ -1,0 +1,45 @@
+:root {
+  --color-teal: #0e7667;
+  --color-teal-dark: #07574e;
+}
+
+.text-teal {
+  color: var(--color-teal) !important;
+}
+
+.btn-teal {
+  background-color: var(--color-teal);
+  color: #fff !important;
+  border: none;
+}
+
+.btn-teal:hover {
+  background-color: var(--color-teal-dark);
+}
+
+.logo-circle {
+  width: 25px;
+  height: 25px;
+  background-color: var(--color-teal);
+  border-radius: 50%;
+}
+
+/* Ajustes del nav */
+.nav-link {
+  color: #333 !important;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: var(--color-teal) !important;
+}
+
+.nav-link.active {
+  border-bottom: 2px solid var(--color-teal);
+  color: var(--color-teal) !important;
+}
+
+.navbar-brand span {
+  font-size: 0.9rem;
+  color: #555;
+}
