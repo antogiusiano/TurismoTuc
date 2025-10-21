@@ -1,4 +1,3 @@
-// routes/usuariosRoutes.js
 import express from "express";
 import {
   getRoles,
@@ -7,18 +6,19 @@ import {
   createUsuario,
   updateUsuario,
   deleteUsuario,
+  loginUsuario, // importamos
 } from "../controllers/usuarios.controller.js";
 
 const router = express.Router();
 
-// Rutas para roles
 router.get("/roles", getRoles);
-
-// Rutas para usuarios
 router.get("/", getUsuarios);
 router.get("/:id", getUsuarioById);
 router.post("/", createUsuario);
 router.put("/:id", updateUsuario);
 router.delete("/:id", deleteUsuario);
+
+// 🔹 Nuevo endpoint de login
+router.post("/login", loginUsuario);
 
 export default router;

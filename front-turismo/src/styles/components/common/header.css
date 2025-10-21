@@ -3,18 +3,16 @@
   --color-teal-dark: #07574e;
 }
 
+/* --- General --- */
+.navbar {
+  width: 100%;
+  border-bottom: 1px solid #dee2e6;
+  height: 70px;
+  font-size: 0.95rem;
+}
+
 .text-teal {
   color: var(--color-teal) !important;
-}
-
-.btn-teal {
-  background-color: var(--color-teal);
-  color: #fff !important;
-  border: none;
-}
-
-.btn-teal:hover {
-  background-color: var(--color-teal-dark);
 }
 
 .logo-circle {
@@ -24,10 +22,13 @@
   border-radius: 50%;
 }
 
-/* Ajustes del nav */
+/* --- Links --- */
 .nav-link {
   color: #333 !important;
   font-weight: 500;
+  text-transform: uppercase;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  padding-bottom: 2px;
 }
 
 .nav-link:hover {
@@ -35,11 +36,66 @@
 }
 
 .nav-link.active {
-  border-bottom: 2px solid var(--color-teal);
   color: var(--color-teal) !important;
+  border-bottom: 2px solid var(--color-teal);
 }
 
-.navbar-brand span {
-  font-size: 0.9rem;
-  color: #555;
+/* --- Botones --- */
+.btn-teal {
+  background-color: var(--color-teal);
+  color: #fff !important;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-teal:hover {
+  background-color: var(--color-teal-dark);
+}
+
+.btn-outline-dark {
+  border-color: #333;
+  color: #333 !important;
+}
+
+.btn-outline-dark:hover {
+  background-color: #333;
+  color: #fff !important;
+}
+
+/* --- Responsive tweaks --- */
+@media (max-width: 991px) {
+  .navbar {
+    height: auto;
+    padding: 0.5rem 1rem;
+  }
+
+  .navbar-collapse {
+    margin-top: 0.5rem;
+  }
+
+  .nav-link {
+    border: none !important;
+  }
+}
+
+
+/* ===== Forzar header full-width ===== */
+.navbar {
+  width: 100vw;              /* Ocupa todo el ancho visible */
+  left: 0;
+  right: 0;
+  top: 0;
+  margin: 0;
+  padding: 0.5rem 2rem;      /* Espaciado interno horizontal */
+  background-color: #fff !important;
+  position: sticky;
+  z-index: 1030;             /* Se mantiene encima del contenido */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Centra y separa mejor el contenido */
+.navbar .container-fluid {
+  max-width: 100%;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }

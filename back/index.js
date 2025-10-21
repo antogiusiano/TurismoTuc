@@ -22,6 +22,7 @@ app.use("/api/excursiones", excursionesRoutes);
 app.use("/api/resenias", reseniasRoutes);
 app.use("/api/personalizacion", personalizacionRoutes);
 
+
 app.get("/", (req, res) => {
   res.send("API MAAVYT 🚀🏞");
 });
