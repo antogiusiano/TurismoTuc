@@ -13,6 +13,8 @@ export default function Sidebar() {
 
   return (
     <div className="sidebar bg-white shadow-sm">
+    <hr />
+    <br />
       <h5 className="fw-bold text-success text-center my-3">Panel Admin</h5>
       <ul className="nav flex-column">
         {links.map((link) => (

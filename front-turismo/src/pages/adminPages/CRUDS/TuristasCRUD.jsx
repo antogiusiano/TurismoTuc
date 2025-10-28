@@ -1,10 +1,9 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainTuristas from '../../../Components/Turistas/MainTuristas.jsx';
-// import EditExcursion from '../../components/Excursion/EditExcursion';
-// import ViewExcursion from '../../components/Excursion/ViewExcursion';
-// import CreateExcursion from '../../components/Excursion/CreateExcursion';
-// import ExcursionesCategoria from '../../components/Excursion/ExcursionesCategoria'; // si lo usás como filtro o vista
+import ViewTurista from '../../../Components/Turistas/ViewTuristas.jsx';
+import EditTurista from '../../../Components/Turistas/EditTuristas.jsx';
+import CreateTurista from '../../../Components/Turistas/CreateTuristas.jsx';
 
 const ExcursionesCRUD = () => {
   return (
@@ -12,10 +11,9 @@ const ExcursionesCRUD = () => {
       <br />
       <Routes>
         <Route path="/" element={<MainTuristas />} />
-        {/* <Route path="edit/:id" element={<EditExcursion />} />
-        <Route path="view/:id" element={<ViewExcursion />} />
-        <Route path="create" element={<CreateExcursion />} /> */}
-        {/* <Route path="categoria/:nombre" element={<ExcursionesCategoria />} /> */}
+        <Route path="view/:id" element={<ViewTurista />} />
+        <Route path="edit/:id" element={<EditTurista />} />
+        <Route path="create" element={< CreateTurista/>} />
       </Routes>
     </main>
   );

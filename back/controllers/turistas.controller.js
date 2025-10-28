@@ -105,3 +105,38 @@ export const deleteTurista = (req, res) => {
     res.json({ message: "Turista eliminado (baja lógica) correctamente" });
   });
 };
+
+
+// =============================
+// RESERVAS DE UN TURISTA (VERSIÓN FINAL CON TU BD)
+// =============================
+export const getReservasByTurista = (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    SELECT 
+      r.id_reserva,
+      e.titulo AS excursion,
+      e.ubicacion,
+      r.cantidad_personas,
+      r.monto_total,
+      r.estado_reserva,
+      r.fecha_reserva,
+      DATE_FORMAT(f.fecha, '%Y-%m-%d') AS fecha_salida,   -- 👈 alias consistente con la UI
+      f.hora_salida
+    FROM Reservas r
+    JOIN FechasExcursion f ON r.id_fecha = f.id_fecha
+    JOIN Excursiones e ON f.id_excursion = e.id_excursion
+    WHERE r.id_turista = ? 
+      AND r.eliminado = 0
+    ORDER BY r.fecha_reserva DESC;
+  `;
+
+  pool.query(sql, [id], (err, results) => {
+    if (err) {
+      console.error("❌ Error al obtener reservas del turista:", err.sqlMessage);
+      return res.status(500).json({ message: "Error al obtener reservas del turista", error: err.sqlMessage });
+    }
+    res.json(results);
+  });
+};
