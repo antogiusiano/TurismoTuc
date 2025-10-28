@@ -19,7 +19,7 @@ export default function MainExcursiones() {
 
   return (
     <div className="container py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">5
+      <div className="d-flex justify-content-between align-items-center mb-3">
         
         <h4 className="fw-bold text-success">Excursiones</h4>
         <Link to="create" className="btn btn-success btn-sm">+ Nueva Excursión</Link>
