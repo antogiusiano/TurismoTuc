@@ -1,24 +1,27 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import FechasExcursion from "./FechaExcursion.jsx";
 
 export default function EditExcursion() {
   const { id } = useParams();
-  console.log("ID recibido:", id);
   const navigate = useNavigate();
   const [excursion, setExcursion] = useState(null);
+  const [imagenes, setImagenes] = useState([]);
 
   useEffect(() => {
-    const fetchExcursion = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/excursiones/${id}`);
-        setExcursion(res.data);
-        console.log("Datos recibidos:", res.data);
+        const resExc = await axios.get(`http://localhost:8000/api/excursiones/${id}`);
+        setExcursion(resExc.data);
+
+        const resImgs = await axios.get(`http://localhost:8000/api/multimedia/excursion/${id}`);
+        setImagenes(resImgs.data);
       } catch (err) {
-        console.error("Error al cargar excursión:", err);
+        console.error("Error al cargar datos:", err);
       }
     };
-    fetchExcursion();
+    fetchData();
   }, [id]);
 
   const handleChange = (e) => {
@@ -32,6 +35,26 @@ export default function EditExcursion() {
       navigate("/dashboard-admin/excursiones");
     } catch (err) {
       console.error("Error al actualizar excursión:", err);
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("imagen", file);
+    formData.append("id_excursion", id);
+    formData.append("tipo", "foto");
+
+    try {
+      await axios.post("http://localhost:8000/api/multimedia", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const resImgs = await axios.get(`http://localhost:8000/api/multimedia/excursion/${id}`);
+      setImagenes(resImgs.data);
+    } catch (err) {
+      console.error("Error al subir imagen:", err);
     }
   };
 
@@ -60,85 +83,30 @@ export default function EditExcursion() {
             <option value="inactiva">Inactiva</option>
           </select>
         </div>
+        <div className="mb-3">
+          <label className="form-label">Descripción</label>
+          <textarea name="descripcion" className="form-control" rows={4} value={excursion.descripcion || ""} onChange={handleChange} />
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Subir imagen</label>
+          <input type="file" className="form-control" accept="image/*" onChange={handleImageUpload} />
+        </div>
         <button type="submit" className="btn btn-success">Guardar cambios</button>
       </form>
+
+      {imagenes.length > 0 && (
+        <div className="mt-4">
+          <h6 className="fw-bold">Imágenes actuales</h6>
+          <div className="d-flex flex-wrap gap-3">
+            {imagenes.map((img) => (
+              <img key={img.id_multimedia} src={img.url} alt="Imagen" className="img-thumbnail" style={{ maxHeight: "200px" }} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <hr className="my-4" />
       <FechasExcursion id_excursion={id} />
     </div>
-  );
-}
-
-function FechasExcursion({ id_excursion }) {
-  const [fechas, setFechas] = useState([]);
-  const [nueva, setNueva] = useState({ fecha: "", hora_salida: "", cupo_maximo: "" });
-
-  useEffect(() => {
-    const fetchFechas = async () => {
-      try {
-        const res = await axios.get(`http://localhost:8000/api/excursiones/${id_excursion}/fechas`);
-        setFechas(res.data);
-      } catch (err) {
-        console.error("Error al obtener fechas:", err);
-      }
-    };
-    fetchFechas();
-  }, [id_excursion]);
-
-  const handleAddFecha = async () => {
-    try {
-      await axios.post("http://localhost:8000/api/fechas-excursion", {
-        id_excursion,
-        ...nueva,
-      });
-      setNueva({ fecha: "", hora_salida: "", cupo_maximo: "" });
-      const res = await axios.get(`http://localhost:8000/api/excursiones/${id_excursion}/fechas`);
-      setFechas(res.data);
-    } catch (err) {
-      console.error("Error al agregar fecha:", err);
-    }
-  };
-
-  return (
-    <>
-      <h5 className="fw-bold">Fechas de la excursión</h5>
-      <table className="table table-sm table-bordered">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Cupo</th>
-            <th>Disponible</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {fechas.map((f) => (
-            <tr key={f.id_fecha}>
-              <td>{new Date(f.fecha).toLocaleDateString()}</td>
-              <td>{f.hora_salida?.slice(0, 5)}</td>
-              <td>{f.cupo_maximo}</td>
-              <td>{f.cupo_disponible}</td>
-              <td>{f.estado}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className="row g-2 mt-3">
-        <div className="col-md-4">
-          <input type="date" className="form-control" value={nueva.fecha} onChange={(e) => setNueva({ ...nueva, fecha: e.target.value })} />
-        </div>
-        <div className="col-md-3">
-          <input type="time" className="form-control" value={nueva.hora_salida} onChange={(e) => setNueva({ ...nueva, hora_salida: e.target.value })} />
-        </div>
-        <div className="col-md-3">
-          <input type="number" className="form-control" placeholder="Cupo" value={nueva.cupo_maximo} onChange={(e) => setNueva({ ...nueva, cupo_maximo: e.target.value })} />
-        </div>
-        <div className="col-md-2">
-          <button className="btn btn-outline-success w-100" onClick={handleAddFecha}>Agregar</button>
-        </div>
-      </div>
-    </>
   );
 }
