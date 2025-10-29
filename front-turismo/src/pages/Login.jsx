@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import useUserStore from "../store/useUserStore"; // 👈 importamos el store
 import "../styles/components/login.css";
 
 export default function Login() {
@@ -9,26 +10,37 @@ export default function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const { user, setUser } = useUserStore();
+
+  // ✅ Si el usuario ya está logueado, redirigimos al dashboard automáticamente
+  useEffect(() => {
+    if (user) {
+      if (user.rol === "Administrador") navigate("/dashboard-admin");
+      else if (user.rol === "Guía turístico" || user.rol === "Personal de ventas")
+        navigate("/dashboard-empleados");
+    }
+  }, [user, navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
 
     try {
-      const response = await axios.post("http://localhost:8000/api/usuarios/login", { email, password });
+      const response = await axios.post("http://localhost:8000/api/usuarios/login", {
+        email,
+        password,
+      });
 
       if (response.data.success) {
         const userData = response.data.user;
-        localStorage.setItem("user", JSON.stringify(userData));
 
-        // redirección según rol
-        if (userData.rol === "Administrador") {
-          navigate("/dashboard-admin");
-        } else if (userData.rol === "Guía turístico" || userData.rol === "Personal de ventas") {
+        // ✅ Guardamos el usuario en Zustand (se persiste en localStorage)
+        setUser(userData);
+
+        if (userData.rol === "Administrador") navigate("/dashboard-admin");
+        else if (userData.rol === "Guía turístico" || userData.rol === "Personal de ventas")
           navigate("/dashboard-empleados");
-        } else {
-          setError("No tiene permisos para acceder al panel.");
-        }
+        else setError("No tiene permisos para acceder al panel.");
       } else {
         setError(response.data.message);
       }

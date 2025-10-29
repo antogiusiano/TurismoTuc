@@ -22,7 +22,7 @@ router.delete("/:id", deleteExcursion);
 
 // Rutas de fechas de excursión
 router.get("/:id_excursion/fechas", getFechasByExcursion);
-router.post("/fechas", createFechaExcursion);
+router.post("/fechas-excursion", createFechaExcursion);
 router.delete("/fechas/:id", deleteFechaExcursion);
 
 export default router;

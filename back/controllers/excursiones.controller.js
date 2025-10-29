@@ -4,6 +4,7 @@ import { pool } from "../config/DB.js";
 // =============================
 // EXCURSIONES
 // =============================
+// Obtener todas las excursiones
 export const getExcursiones = (req, res) => {
   const sql = `SELECT id_excursion, titulo, descripcion, precio_base, duracion, 
                       ubicacion, incluye, politicas, estado, fecha_creacion
@@ -19,7 +20,7 @@ export const getExcursiones = (req, res) => {
     res.json(results);
   });
 };
-
+// Obtener una excursión por ID
 export const getExcursionById = (req, res) => {
   const { id } = req.params;
 
@@ -38,7 +39,7 @@ export const getExcursionById = (req, res) => {
     res.json(results[0]);
   });
 };
-
+// Crear una nueva excursión
 export const createExcursion = (req, res) => {
   const { titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas } = req.body;
 
@@ -59,7 +60,7 @@ export const createExcursion = (req, res) => {
     res.status(201).json({ message: "Excursión creada correctamente", id: result.insertId });
   });
 };
-
+// Actualizar una excursión existente
 export const updateExcursion = (req, res) => {
   const { id } = req.params;
   const { titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas, estado } = req.body;
@@ -81,7 +82,7 @@ export const updateExcursion = (req, res) => {
     res.json({ message: "Excursión actualizada correctamente" });
   });
 };
-
+// Eliminar (baja lógica) una excursión
 export const deleteExcursion = (req, res) => {
   const { id } = req.params;
 
@@ -103,6 +104,8 @@ export const deleteExcursion = (req, res) => {
 // =============================
 // FECHAS DE EXCURSIÓN
 // =============================
+
+// Obtener todas las fechas para una excursión específica
 export const getFechasByExcursion = (req, res) => {
   const { id_excursion } = req.params;
 
@@ -119,7 +122,7 @@ export const getFechasByExcursion = (req, res) => {
     res.json(results);
   });
 };
-
+// Crear una nueva fecha para una excursión
 export const createFechaExcursion = (req, res) => {
   const { id_excursion, fecha, hora_salida, cupo_maximo } = req.body;
 
@@ -139,7 +142,7 @@ export const createFechaExcursion = (req, res) => {
     res.status(201).json({ message: "Fecha agregada correctamente", id: result.insertId });
   });
 };
-
+// Eliminar (baja lógica) una fecha de excursión
 export const deleteFechaExcursion = (req, res) => {
   const { id } = req.params;
 
@@ -155,5 +158,58 @@ export const deleteFechaExcursion = (req, res) => {
     if (result.affectedRows === 0)
       return res.status(404).json({ message: "Fecha no encontrada" });
     res.json({ message: "Fecha eliminada (baja lógica) correctamente" });
+  });
+};
+
+
+// Actualizar fecha y hora de salida de una excursión
+export const updateFechaExcursion = (req, res) => {
+  const { id } = req.params;
+  const { fecha, hora_salida, cupo_maximo, cupo_disponible, estado } = req.body;
+
+  // Validación mínima
+  if (!fecha && !hora_salida && !cupo_maximo && !cupo_disponible && !estado)
+    return res.status(400).json({ message: "No se enviaron datos para actualizar" });
+
+  const fields = [];
+  const values = [];
+
+  if (fecha) {
+    fields.push("fecha = ?");
+    values.push(fecha);
+  }
+  if (hora_salida) {
+    fields.push("hora_salida = ?");
+    values.push(hora_salida);
+  }
+  if (cupo_maximo) {
+    fields.push("cupo_maximo = ?");
+    values.push(cupo_maximo);
+  }
+  if (cupo_disponible) {
+    fields.push("cupo_disponible = ?");
+    values.push(cupo_disponible);
+  }
+  if (estado) {
+    fields.push("estado = ?");
+    values.push(estado);
+  }
+
+  const sql = `
+    UPDATE FechasExcursion
+    SET ${fields.join(", ")}
+    WHERE id_fecha = ? AND eliminado = 0
+  `;
+  values.push(id);
+
+  pool.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error al actualizar fecha de excursión:", err);
+      return res.status(500).json({ message: "Error al actualizar fecha" });
+    }
+    if (result.affectedRows === 0)
+      return res.status(404).json({ message: "Fecha no encontrada" });
+
+    res.json({ message: "Fecha de excursión actualizada correctamente" });
   });
 };
