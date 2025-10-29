@@ -1,8 +1,30 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 export default function ReservasCRUD() {
   const [reservas, setReservas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+  const fetchReservas = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/api/reservas");
+      setReservas(res.data);
+    } catch (err) {
+      console.error("Error al obtener reservas:", err);
+      setError("No se pudieron cargar las reservas");
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchReservas();
+}, []);
+
+  if (loading) return <div className="text-center">Cargando reservas...</div>;
+  if (error) return <div className="alert alert-danger">{error}</div>;
+
 
   const handleEdit = (reserva) => {
     // por ahora solo mostrar alerta; se puede abrir modal aquí
@@ -10,27 +32,26 @@ export default function ReservasCRUD() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta reserva?')) return;
-    try {
-      await axios.delete(`http://localhost:8000/api/reservas/${id}`);
-      setReservas(prev => prev.filter(r => r.id_reserva !== id));
-    } catch (err) {
-      console.error('Error al eliminar reserva:', err);
-      alert('No se pudo eliminar la reserva');
-    }
-  };
+  const confirm = await Swal.fire({
+    title: '¿Eliminar reserva?',
+    text: 'Esta acción no se puede deshacer',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  });
 
-  useEffect(() => {
-    const fetchReservas = async () => {
-      try {
-        const res = await axios.get("http://localhost:8000/api/reservas");
-        setReservas(res.data);
-      } catch (err) {
-        console.error("Error al obtener reservas:", err);
-      }
-    };
-    fetchReservas();
-  }, []);
+  if (!confirm.isConfirmed) return;
+
+  try {
+    await axios.delete(`http://localhost:8000/api/reservas/${id}`);
+    setReservas(prev => prev.filter(r => r.id_reserva !== id));
+    Swal.fire('Eliminada', 'La reserva ha sido eliminada', 'success');
+  } catch (err) {
+    console.error('Error al eliminar reserva:', err);
+    Swal.fire('Error', 'No se pudo eliminar la reserva', 'error');
+  }
+};
 
   return (
     <div className="card shadow-sm p-3">
