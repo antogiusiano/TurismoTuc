@@ -9,6 +9,8 @@ import { pool } from "../config/DB.js";
 export const getReservas = (req, res) => {
   const { estado } = req.query; // puede ser: 'activas', 'eliminadas', 'todas'
   console.log("📩 Filtro recibido:", estado);
+  console.log("📩 URL recibida:", req.originalUrl);
+console.log("📩 Query:", req.query);
   let condicion = "";
   if (estado === "activas") {
     condicion = "WHERE r.eliminado = 0";
