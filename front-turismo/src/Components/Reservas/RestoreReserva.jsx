@@ -7,6 +7,7 @@ const RestoreReserva = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  
   const fetchEliminadas = async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/reservas/eliminadas");
