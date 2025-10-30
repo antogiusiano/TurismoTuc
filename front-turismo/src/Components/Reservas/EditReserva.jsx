@@ -143,7 +143,7 @@ export default function EditReserva() {
         <button type="submit" className="btn btn-warning">
           Guardar cambios
         </button>
-        <Link to="/reservas" className="btn btn-secondary ms-2">
+        <Link to="/dashboard-admin/reservas" className="btn btn-secondary ms-2">
           Volver
         </Link>
       </form>

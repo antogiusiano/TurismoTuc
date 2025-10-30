@@ -129,6 +129,25 @@ export const deleteReserva = (req, res) => {
   });
 };
 
+export const restoreReserva = (req, res) => {
+  const { id } = req.params;
+  const sql = `
+    UPDATE Reservas
+    SET eliminado = 0, fecha_eliminacion = NULL
+    WHERE id_reserva = ?
+  `;
+  pool.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error al restaurar reserva:", err);
+      return res.status(500).json({ message: "Error al restaurar reserva" });
+    }
+    if (result.affectedRows === 0)
+      return res.status(404).json({ message: "Reserva no encontrada" });
+    res.json({ message: "Reserva restaurada correctamente" });
+  });
+};
+
+
 // =============================
 // PAGOS
 // =============================

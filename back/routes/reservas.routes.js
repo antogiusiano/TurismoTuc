@@ -6,6 +6,7 @@ import {
   createReserva,
   updateReserva,
   deleteReserva,
+  restoreReserva,
   getPagos,
   createPago,
   deletePago,
@@ -19,6 +20,7 @@ router.get("/:id", getReservaById);
 router.post("/", createReserva);
 router.put("/:id", updateReserva);
 router.delete("/:id", deleteReserva);
+router.put("/restore/:id", restoreReserva);
 
 // Pagos
 router.get("/pagos/listar", getPagos);

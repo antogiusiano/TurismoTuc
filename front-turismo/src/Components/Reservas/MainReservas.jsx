@@ -1,72 +1,115 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { Link } from "react-router-dom";
 
 export default function ReservasMain() {
   const [reservas, setReservas] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [filtro, setFiltro] = useState("activas"); // 'activas', 'eliminadas' o 'todas'
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const cargarReservas = async () => {
+  const fetchReservas = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await axios.get("http://localhost:8000/api/reservas");
-      setReservas(res.data.filter(r => r.eliminado !== 1)); // solo activas
+      const res = await axios.get(
+        `http://localhost:8000/api/reservas?filtro=${filtro}`
+      );
+      setReservas(res.data);
     } catch (err) {
-      console.error(err);
-      setError("Error al cargar reservas");
+      console.error("Error al obtener reservas:", err);
+      setError("No se pudieron cargar las reservas.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    cargarReservas();
-  }, []);
+    fetchReservas();
+  }, [filtro]);
 
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
-      title: '¿Eliminar reserva?',
-      text: 'Esta acción marcará la reserva como eliminada',
-      icon: 'warning',
+      title: "¿Eliminar reserva?",
+      text: "Esta acción no se puede deshacer",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
     });
 
     if (!confirm.isConfirmed) return;
 
     try {
-      // Optimistic update
-      setReservas(prev => prev.filter(r => r.id_reserva !== id));
-
-      // Baja lógica backend
       await axios.delete(`http://localhost:8000/api/reservas/${id}`);
-
-      // Refrescar lista
-      await cargarReservas();
-
-      Swal.fire({
-        title: 'Eliminada',
-        text: 'La reserva fue dada de baja correctamente',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      Swal.fire("Eliminada", "La reserva ha sido eliminada", "success");
+      fetchReservas();
     } catch (err) {
-      console.error(err);
-      await cargarReservas();
-      Swal.fire('Error', 'No se pudo eliminar la reserva', 'error');
+      console.error("Error al eliminar reserva:", err);
+      Swal.fire("Error", "No se pudo eliminar la reserva", "error");
     }
   };
 
-  if (loading) return <div className="text-center mt-4">Cargando reservas...</div>;
-  if (error) return <div className="alert alert-danger mt-4">{error}</div>;
+  const handleRestore = async (id) => {
+    const confirm = await Swal.fire({
+      title: "¿Restaurar reserva?",
+      text: "La reserva volverá a estar activa",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, restaurar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axios.put(`http://localhost:8000/api/reservas/restore/${id}`);
+      Swal.fire("Restaurada", "La reserva ha sido restaurada", "success");
+      fetchReservas();
+    } catch (err) {
+      console.error("Error al restaurar reserva:", err);
+      Swal.fire("Error", "No se pudo restaurar la reserva", "error");
+    }
+  };
+
+  if (loading) return <div className="text-center mt-3">Cargando reservas...</div>;
+  if (error) return <div className="alert alert-danger mt-3">{error}</div>;
 
   return (
     <div className="card shadow-sm p-3">
-      <h5 className="fw-bold text-success mb-3">Gestión de Reservas</h5>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h5 className="fw-bold text-success mb-0">Gestión de Reservas</h5>
+
+        {/* 🔽 Dropdown de filtros */}
+        <div className="dropdown">
+          <button
+            className="btn btn-outline-primary dropdown-toggle"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i className="bi bi-funnel"></i> Filtrar reservas
+          </button>
+          <ul className="dropdown-menu dropdown-menu-end">
+            <li>
+              <button className="dropdown-item" onClick={() => setFiltro("activas")}>
+                <i className="bi bi-check-circle text-success me-2"></i>Activas
+              </button>
+            </li>
+            <li>
+              <button className="dropdown-item" onClick={() => setFiltro("eliminadas")}>
+                <i className="bi bi-x-circle text-danger me-2"></i>Eliminadas
+              </button>
+            </li>
+            <li>
+              <button className="dropdown-item" onClick={() => setFiltro("todas")}>
+                <i className="bi bi-list-ul text-secondary me-2"></i>Todas
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
 
       <table className="table table-hover align-middle">
         <thead className="table-light">
@@ -79,7 +122,7 @@ export default function ReservasMain() {
             <th>Monto Total</th>
             <th>Estado</th>
             <th>Fecha Reserva</th>
-            <th className="text-center">Acciones</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -93,35 +136,53 @@ export default function ReservasMain() {
                 <td>{r.cantidad_personas}</td>
                 <td>${parseFloat(r.monto_total).toFixed(2)}</td>
                 <td>
-                  <span className={`badge ${
-                    r.estado_reserva === "confirmada" ? "bg-success" :
-                    r.estado_reserva === "pendiente" ? "bg-warning" :
-                    "bg-secondary"
-                  }`}>
+                  <span
+                    className={`badge ${
+                      r.estado_reserva === "confirmada"
+                        ? "bg-success"
+                        : r.estado_reserva === "pendiente"
+                        ? "bg-warning"
+                        : "bg-danger"
+                    }`}
+                  >
                     {r.estado_reserva}
                   </span>
                 </td>
                 <td>{new Date(r.fecha_reserva).toLocaleDateString()}</td>
-                <td className="text-center">
-                  <div className="d-flex justify-content-center gap-1">
+                <td>
+                  <div className="btn-group" role="group">
+                    {/* 👁️ Ver */}
                     <Link
                       to={`/dashboard-admin/reservas/view/${r.id_reserva}`}
                       className="btn btn-outline-secondary btn-sm"
                     >
-                      Ver
+                      <i className="bi bi-eye"></i>
                     </Link>
+
+                    {/* ✏️ Editar */}
                     <Link
                       to={`/dashboard-admin/reservas/edit/${r.id_reserva}`}
                       className="btn btn-outline-primary btn-sm"
                     >
-                      Editar
+                      <i className="bi bi-pencil"></i>
                     </Link>
-                    <button
-                      className="btn btn-outline-danger btn-sm"
-                      onClick={() => handleDelete(r.id_reserva)}
-                    >
-                      Eliminar
-                    </button>
+
+                    {/* ❌ Eliminar o 🔄 Restaurar */}
+                    {r.eliminado ? (
+                      <button
+                        className="btn btn-outline-success btn-sm"
+                        onClick={() => handleRestore(r.id_reserva)}
+                      >
+                        <i className="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => handleDelete(r.id_reserva)}
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>
