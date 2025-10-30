@@ -9,7 +9,7 @@ export default function ReservasMain() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchReservas = async () => {
+  const getReservas = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -26,7 +26,7 @@ export default function ReservasMain() {
   };
 
   useEffect(() => {
-    fetchReservas();
+    gethReservas();
   }, [filtro]);
 
   const handleDelete = async (id) => {
@@ -44,7 +44,7 @@ export default function ReservasMain() {
     try {
       await axios.delete(`http://localhost:8000/api/reservas/${id}`);
       Swal.fire("Eliminada", "La reserva ha sido eliminada", "success");
-      fetchReservas();
+      getReservas();
     } catch (err) {
       console.error("Error al eliminar reserva:", err);
       Swal.fire("Error", "No se pudo eliminar la reserva", "error");
@@ -77,7 +77,7 @@ export default function ReservasMain() {
   if (error) return <div className="alert alert-danger mt-3">{error}</div>;
 
   return (
-    <div className="card shadow-sm p-3">
+    <div className="card shadow-sm p-3 mt-5">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="fw-bold text-success mb-0">Gestión de Reservas</h5>
 
