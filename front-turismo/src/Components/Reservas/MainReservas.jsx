@@ -105,16 +105,16 @@ export default function ReservasMain() {
                 <td className="text-center">
                   <div className="d-flex justify-content-center gap-1">
                     <Link
-                      to={`/reservas/edit/${r.id_reserva}`}
-                      className="btn btn-outline-primary btn-sm"
-                    >
-                      Editar
-                    </Link>
-                    <Link
-                      to={`/reservas/view/${r.id_reserva}`}
+                      to={`/dashboard-admin/reservas/view/${r.id_reserva}`}
                       className="btn btn-outline-secondary btn-sm"
                     >
                       Ver
+                    </Link>
+                    <Link
+                      to={`/dashboard-admin/reservas/edit/${r.id_reserva}`}
+                      className="btn btn-outline-primary btn-sm"
+                    >
+                      Editar
                     </Link>
                     <button
                       className="btn btn-outline-danger btn-sm"

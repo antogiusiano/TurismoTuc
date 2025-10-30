@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
 export default function EditReserva() {
   const { id } = useParams();
-  const navigate = useNavigate();
-
   const [reserva, setReserva] = useState({
     turista: "",
     excursion: "",
@@ -34,13 +32,11 @@ export default function EditReserva() {
     fetchReserva();
   }, [id]);
 
-  // 🔹 Manejo de cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setReserva(prev => ({ ...prev, [name]: value }));
+    setReserva((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 🔹 Guardar cambios
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -52,14 +48,14 @@ export default function EditReserva() {
         timer: 2000,
         showConfirmButton: false,
       });
-      navigate("/reservas"); // volver al listado
     } catch (err) {
       console.error(err);
       Swal.fire("Error", "No se pudo actualizar la reserva", "error");
     }
   };
 
-  if (loading) return <div className="text-center mt-4">Cargando reserva...</div>;
+  if (loading)
+    return <div className="text-center mt-4">Cargando reserva...</div>;
   if (error) return <div className="alert alert-danger mt-4">{error}</div>;
 
   return (
@@ -144,14 +140,12 @@ export default function EditReserva() {
           </select>
         </div>
 
-        <button type="submit" className="btn btn-warning">Guardar cambios</button>
-        <button
-          type="button"
-          className="btn btn-secondary ms-2"
-          onClick={() => navigate("/reservas")}
-        >
-          Cancelar
+        <button type="submit" className="btn btn-warning">
+          Guardar cambios
         </button>
+        <Link to="/reservas" className="btn btn-secondary ms-2">
+          Volver
+        </Link>
       </form>
     </div>
   );

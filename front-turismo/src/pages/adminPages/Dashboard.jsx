@@ -6,7 +6,7 @@ import ReservasCRUD from "../adminPages/CRUDS/ReservasCRUD";
 // import UsuariosCRUD from "./UsuariosCRUD";
 import ReseñasCRUD from "../adminPages/CRUDS/ReseniasCRUD"; 
 
-export default function Dashboard() {
+const Dashboard = () => {
   return (
     <div className="dashboard-container d-flex flex-column">
       <div className="d-flex flex-grow-1">
@@ -19,8 +19,8 @@ export default function Dashboard() {
             <Route path="/" element={<h5 className="text-success">Bienvenido al Panel Admin 👋</h5>} />
             <Route path="turistas/*" element={<TuristasCRUD />} />
             <Route path="excursiones/*" element={<ExcursionesCRUD />} />
-            <Route path="reservas/" element={<ReservasCRUD />} />
-            <Route path="reseñas/" element={<ReseñasCRUD />} />
+            <Route path="reservas/*" element={<ReservasCRUD />} />
+            <Route path="reseñas/*" element={<ReseñasCRUD />} />
             {/* <Route path="usuarios" element={<UsuariosCRUD />} /> */}
           </Routes>
         </main>
@@ -28,3 +28,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export default Dashboard;
