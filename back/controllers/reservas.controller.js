@@ -5,8 +5,17 @@ import { pool } from "../config/DB.js";
 // RESERVAS
 // =============================
 
-// Obtener todas las reservas con información relacionada
+// Obtener las reservas con información relacionada y filtro
 export const getReservas = (req, res) => {
+  const { estado } = req.query; // puede ser: 'activas', 'eliminadas', 'todas'
+
+  let condicion = "";
+  if (estado === "activas") {
+    condicion = "WHERE r.eliminado = 0";
+  } else if (estado === "eliminadas") {
+    condicion = "WHERE r.eliminado = 1";
+  } // si es 'todas', no agrega WHERE
+
   const sql = `
     SELECT 
       r.id_reserva, 
@@ -16,12 +25,13 @@ export const getReservas = (req, res) => {
       r.cantidad_personas,
       r.monto_total,
       r.estado_reserva,
-      r.fecha_reserva
+      r.fecha_reserva,
+      r.eliminado
     FROM Reservas r
     JOIN Turistas t ON r.id_turista = t.id_turista
     JOIN FechasExcursion f ON r.id_fecha = f.id_fecha
     JOIN Excursiones e ON f.id_excursion = e.id_excursion
-    WHERE r.eliminado = 0
+    ${condicion}
     ORDER BY r.fecha_reserva DESC;
   `;
 
@@ -33,6 +43,7 @@ export const getReservas = (req, res) => {
     res.json(results);
   });
 };
+
 
 // Obtener reserva por ID
 export const getReservaById = (req, res) => {

@@ -26,7 +26,7 @@ export default function ReservasMain() {
   };
 
   useEffect(() => {
-    gethReservas();
+    getReservas();
   }, [filtro]);
 
   const handleDelete = async (id) => {
@@ -66,7 +66,7 @@ export default function ReservasMain() {
     try {
       await axios.put(`http://localhost:8000/api/reservas/restore/${id}`);
       Swal.fire("Restaurada", "La reserva ha sido restaurada", "success");
-      fetchReservas();
+      getReservas();
     } catch (err) {
       console.error("Error al restaurar reserva:", err);
       Swal.fire("Error", "No se pudo restaurar la reserva", "error");
