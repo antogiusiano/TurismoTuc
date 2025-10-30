@@ -16,6 +16,8 @@ export default function ReservasMain() {
       const res = await axios.get(
         `http://localhost:8000/api/reservas?filtro=${filtro}`
       );
+      console.log("Actual:",filtro)
+      console.log("reponse:",res.data)
       setReservas(res.data);
     } catch (err) {
       console.error("Error al obtener reservas:", err);

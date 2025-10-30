@@ -8,7 +8,7 @@ import { pool } from "../config/DB.js";
 // Obtener las reservas con información relacionada y filtro
 export const getReservas = (req, res) => {
   const { estado } = req.query; // puede ser: 'activas', 'eliminadas', 'todas'
-
+  console.log("📩 Filtro recibido:", estado);
   let condicion = "";
   if (estado === "activas") {
     condicion = "WHERE r.eliminado = 0";
