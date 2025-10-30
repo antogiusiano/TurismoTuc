@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { FaUsers, FaMapMarkedAlt, FaClipboardList, FaComments, FaUserTie } from "react-icons/fa";
 import "../../styles/components/sidebar.css";
 
@@ -15,7 +15,7 @@ export default function Sidebar() {
     <div className="sidebar bg-white shadow-sm">
     <hr />
     <br />
-      <h5 className="fw-bold text-success text-center my-3">Panel Admin</h5>
+      <Link to="/dashboard-admin" className="fw-bold text-success mb-3 d-block text-decoration-none"> Panel Admin </Link>
       <ul className="nav flex-column">
         {links.map((link) => (
           <li key={link.to} className="nav-item">

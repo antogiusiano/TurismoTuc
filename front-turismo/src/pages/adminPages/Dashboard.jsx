@@ -5,6 +5,8 @@ import ExcursionesCRUD from "../adminPages/CRUDS/ExcursionesCRUD";
 import ReservasCRUD from "../adminPages/CRUDS/ReservasCRUD";
 import UsuariosCRUD from "../adminPages/CRUDS/UsuariosCRUD";
 import ReseñasCRUD from "../adminPages/CRUDS/ReseniasCRUD"; 
+import DashboardHome from "../adminPages/DashboardHome";
+
 
 export default function Dashboard() {
   return (
@@ -22,6 +24,8 @@ export default function Dashboard() {
             <Route path="reservas/" element={<ReservasCRUD />} />
             <Route path="reseñas/*" element={<ReseñasCRUD />} />
             <Route path="usuarios/*" element={<UsuariosCRUD />} />
+            
+            <Route index element={<DashboardHome />} />
           </Routes>
         </main>
       </div>
