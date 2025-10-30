@@ -3,7 +3,7 @@ import Sidebar from "../adminPages/Sidebar";
 import TuristasCRUD from "../adminPages/CRUDS/TuristasCRUD";
 import ExcursionesCRUD from "../adminPages/CRUDS/ExcursionesCRUD";
 import ReservasCRUD from "../adminPages/CRUDS/ReservasCRUD";
-// import UsuariosCRUD from "./UsuariosCRUD";
+import UsuariosCRUD from "../adminPages/CRUDS/UsuariosCRUD";
 import ReseñasCRUD from "../adminPages/CRUDS/ReseniasCRUD"; 
 
 export default function Dashboard() {
@@ -20,8 +20,8 @@ export default function Dashboard() {
             <Route path="turistas/*" element={<TuristasCRUD />} />
             <Route path="excursiones/*" element={<ExcursionesCRUD />} />
             <Route path="reservas/" element={<ReservasCRUD />} />
-            <Route path="reseñas/" element={<ReseñasCRUD />} />
-            {/* <Route path="usuarios" element={<UsuariosCRUD />} /> */}
+            <Route path="reseñas/*" element={<ReseñasCRUD />} />
+            <Route path="usuarios/*" element={<UsuariosCRUD />} />
           </Routes>
         </main>
       </div>

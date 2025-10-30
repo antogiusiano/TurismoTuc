@@ -1,10 +1,8 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainResenias from '../../../Components/Reseñas/MainResenias.jsx';
-// import EditExcursion from '../../components/Excursion/EditExcursion';
-// import ViewExcursion from '../../components/Excursion/ViewExcursion';
-// import CreateExcursion from '../../components/Excursion/CreateExcursion';
-// import ExcursionesCategoria from '../../components/Excursion/ExcursionesCategoria'; // si lo usás como filtro o vista
+import EditResenia from '../../../Components/Reseñas/EditResenias.jsx';
+
 
 const ExcursionesCRUD = () => {
   return (
@@ -12,10 +10,7 @@ const ExcursionesCRUD = () => {
       <br />
       <Routes>
         <Route path="/" element={<MainResenias />} />
-        {/* <Route path="edit/:id" element={<EditExcursion />} />
-        <Route path="view/:id" element={<ViewExcursion />} />
-        <Route path="create" element={<CreateExcursion />} /> */}
-        {/* <Route path="categoria/:nombre" element={<ExcursionesCategoria />} /> */}
+        <Route path="edit/:id" element={<EditResenia />} />
       </Routes>
     </main>
   );
