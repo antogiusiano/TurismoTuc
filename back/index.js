@@ -8,6 +8,9 @@ import excursionesRoutes from "./routes/excurisiones.routes.js";
 import reseniasRoutes from "./routes/resenia.routes.js";
 import personalizacionRoutes from "./routes/personalizacion.routes.js";
 import multimediaRoutes from "./routes/multimedia.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
+
+
 
 const app = express()
 
@@ -23,6 +26,7 @@ app.use("/api/excursiones", excursionesRoutes);
 app.use("/api/resenias", reseniasRoutes);
 app.use("/api/personalizacion", personalizacionRoutes);
 app.use("/api/multimedia", multimediaRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Servir archivos estáticos (imágenes)
 app.use("/uploads", express.static("uploads"));
