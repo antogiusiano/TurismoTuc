@@ -7,14 +7,14 @@ import { pool } from "../config/DB.js";
 
 // Obtener las reservas con información relacionada y filtro
 export const getReservas = (req, res) => {
-  const { estado } = req.query; // puede ser: 'activas', 'eliminadas', 'todas'
-  console.log("📩 Filtro recibido:", estado);
-  console.log("📩 URL recibida:", req.originalUrl);
-console.log("📩 Query:", req.query);
+  const { filtro } = req.query; // puede ser: 'activas', 'eliminadas', 'todas'
+  //console.log("📩 Filtro recibido:", filtro);
+  //console.log("📩 URL recibida:", req.originalUrl);
+  //console.log("📩 Query:", req.query);
   let condicion = "";
-  if (estado === "activas") {
+  if (filtro === "activas") {
     condicion = "WHERE r.eliminado = 0";
-  } else if (estado === "eliminadas") {
+  } else if (filtro === "eliminadas") {
     condicion = "WHERE r.eliminado = 1";
   } // si es 'todas', no agrega WHERE
 
