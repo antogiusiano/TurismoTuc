@@ -5,9 +5,10 @@ import Swal from "sweetalert2";
 
 export default function ReservasMain() {
   const [reservas, setReservas] = useState([]);
-  const [filtro, setFiltro] = useState("activas"); // 'activas', 'eliminadas' o 'todas'
+  const [filtro, setFiltro] = useState("activas"); // 'activas', 'eliminadas' o 'todas' como filtros
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
 
   const getReservas = async () => {
     setLoading(true);
@@ -16,8 +17,8 @@ export default function ReservasMain() {
       const res = await axios.get(
         `http://localhost:8000/api/reservas?filtro=${filtro}`
       );
-      console.log("Actual:",filtro)
-      console.log("reponse:",res.data)
+      console.log("Actual:", filtro);
+      console.log("reponse:", res.data);
       setReservas(res.data);
     } catch (err) {
       console.error("Error al obtener reservas:", err);
@@ -75,7 +76,8 @@ export default function ReservasMain() {
     }
   };
 
-  if (loading) return <div className="text-center mt-3">Cargando reservas...</div>;
+  if (loading)
+    return <div className="text-center mt-3">Cargando reservas...</div>;
   if (error) return <div className="alert alert-danger mt-3">{error}</div>;
 
   return (
@@ -83,33 +85,53 @@ export default function ReservasMain() {
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="fw-bold text-success mb-0">Gestión de Reservas</h5>
 
-        {/* 🔽 Dropdown de filtros */}
-        <div className="dropdown">
-          <button
-            className="btn btn-outline-primary dropdown-toggle"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
+        <div className="d-flex gap-2">
+          {/* 🔹 Botón Crear Reserva */}
+          <Link
+            to="/dashboard-admin/reservas/create"
+            className="btn btn-success"
           >
-            <i className="bi bi-funnel"></i> Filtrar reservas
-          </button>
-          <ul className="dropdown-menu dropdown-menu-end">
-            <li>
-              <button className="dropdown-item" onClick={() => setFiltro("activas")}>
-                <i className="bi bi-check-circle text-success me-2"></i>Activas
-              </button>
-            </li>
-            <li>
-              <button className="dropdown-item" onClick={() => setFiltro("eliminadas")}>
-                <i className="bi bi-x-circle text-danger me-2"></i>Eliminadas
-              </button>
-            </li>
-            <li>
-              <button className="dropdown-item" onClick={() => setFiltro("todas")}>
-                <i className="bi bi-list-ul text-secondary me-2"></i>Todas
-              </button>
-            </li>
-          </ul>
+            <i className="bi bi-plus-circle me-1"></i> Crear Reserva
+          </Link>
+
+          {/* 🔽 Dropdown de filtros */}
+          <div className="dropdown">
+            <button
+              className="btn btn-outline-primary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="bi bi-funnel"></i> Filtrar reservas
+            </button>
+            <ul className="dropdown-menu dropdown-menu-end">
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setFiltro("activas")}
+                >
+                  <i className="bi bi-check-circle text-success me-2"></i>
+                  Activas
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setFiltro("eliminadas")}
+                >
+                  <i className="bi bi-x-circle text-danger me-2"></i>Eliminadas
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setFiltro("todas")}
+                >
+                  <i className="bi bi-list-ul text-secondary me-2"></i>Todas
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 

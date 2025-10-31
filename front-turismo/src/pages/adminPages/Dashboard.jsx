@@ -14,6 +14,19 @@ const Dashboard = () => {
       {/* === SIDEBAR FIJO === */}
       <Sidebar />
 
+        {/* Contenido principal */}
+        <main className="flex-grow-1 p-4 bg-light" style={{ minHeight: "calc(100vh - 160px)" }}>
+          <Routes>
+            <Route path="/" element={<h5 className="text-success">Bienvenido al Panel Admin 👋</h5>} />
+            <Route path="turistas/*" element={<TuristasCRUD />} />
+            <Route path="excursiones/*" element={<ExcursionesCRUD />} />
+            <Route path="reservas/*" element={<ReservasCRUD />} />
+            <Route path="reseñas/*" element={<ReseñasCRUD />} />
+            <Route path="usuarios/*" element={<UsuariosCRUD />} />
+            <Route index element={<DashboardHome />} />
+          </Routes>
+        </main>
+      </div>
       {/* === CONTENIDO PRINCIPAL === */}
       <main className="dashboard-container flex-grow-1">
         <Routes>
