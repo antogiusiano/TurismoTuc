@@ -5,9 +5,10 @@ import Swal from "sweetalert2";
 
 export default function ReservasMain() {
   const [reservas, setReservas] = useState([]);
-  const [filtro, setFiltro] = useState("activas"); // 'activas', 'eliminadas' o 'todas'
+  const [filtro, setFiltro] = useState("activas"); // 'activas', 'eliminadas' o 'todas' como filtros
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
 
   const getReservas = async () => {
     setLoading(true);
