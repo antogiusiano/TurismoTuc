@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Card, Button, Table, Alert } from "react-bootstrap";
 
 export default function MainTuristas() {
   const [turistas, setTuristas] = useState([]);
@@ -8,13 +9,13 @@ export default function MainTuristas() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Cargar turistas
   const fetchTuristas = async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/turistas");
       setTuristas(res.data);
     } catch (err) {
       console.error("Error al obtener turistas:", err);
+      setError("No se pudieron cargar los turistas.");
     }
   };
 
@@ -22,90 +23,100 @@ export default function MainTuristas() {
     fetchTuristas();
   }, []);
 
-  // Eliminar turista
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("¿Seguro que querés eliminar este turista?");
-    if (!confirmDelete) return;
-
-    setError("");
-    setMensaje("");
-
     try {
+      const confirmDelete = window.confirm("¿Seguro que querés eliminar este turista?");
+      if (!confirmDelete) return;
+
+      setError("");
+      setMensaje("");
+
       const res = await axios.delete(`http://localhost:8000/api/turistas/${id}`);
-      setMensaje(res.data.message || "Turista eliminado correctamente");
-      // Actualizar lista
+      setMensaje("✅ Turista eliminado correctamente");
       setTuristas(turistas.filter((t) => t.id_turista !== id));
+      
+      // Limpiar mensaje después de 2.5 segundos
+      setTimeout(() => setMensaje(""), 2500);
     } catch (err) {
       console.error("Error al eliminar turista:", err);
-      setError("Error al eliminar turista.");
+      setError("No se pudo eliminar el turista.");
     }
   };
 
   return (
-    <div className="card shadow-sm p-3">
-      <br />
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="fw-bold text-success mb-0">Gestión de Turistas</h5>
-        <button className="btn btn-success btn-sm" onClick={() => navigate("/dashboard-admin/turistas/create")}>
-          ➕ Agregar Turista
-        </button>
-      </div>
+    <Card className="shadow-sm">
+      <Card.Body>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="fw-bold text-success mb-0">Gestión de Turistas</h5>
+          <Button 
+            variant="success" 
+            size="sm"
+            onClick={() => navigate("/dashboard-admin/turistas/create")}
+          >
+            <i className="bi bi-plus-circle me-1"></i> Agregar Turista
+          </Button>
+        </div>
 
-      {/* Mensajes */}
-      {mensaje && <div className="alert alert-success py-2">{mensaje}</div>}
-      {error && <div className="alert alert-danger py-2">{error}</div>}
+        {mensaje && <Alert variant="success" className="py-2">{mensaje}</Alert>}
+        {error && <Alert variant="danger" className="py-2">{error}</Alert>}
 
-      <table className="table table-hover align-middle">
-        <thead className="table-light">
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {turistas.length > 0 ? (
-            turistas.map((t) => (
-              <tr key={t.id_turista}>
-                <td>{t.id_turista}</td>
-                <td>{t.nombre}</td>
-                <td>{t.email}</td>
-                <td>{t.telefono}</td>
-                <td>
-                  <button
-                    className="btn btn-outline-info btn-sm me-2"
-                    onClick={() => navigate(`/dashboard-admin/turistas/view/${t.id_turista}`)}
-                  >
-                    Ver
-                  </button>
+        <Table hover responsive className="align-middle">
+          <thead className="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {turistas.length > 0 ? (
+              turistas.map((t) => (
+                <tr key={t.id_turista}>
+                  <td>{t.id_turista}</td>
+                  <td>{t.nombre}</td>
+                  <td>{t.email}</td>
+                  <td>{t.telefono}</td>
+                  <td>
+                    <div className="btn-group" role="group">
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => navigate(`/dashboard-admin/turistas/view/${t.id_turista}`)}
+                      >
+                        <i className="bi bi-eye"></i>
+                      </Button>
 
-                  <button
-                    className="btn btn-outline-primary btn-sm me-2"
-                    onClick={() => navigate(`/dashboard-admin/turistas/edit/${t.id_turista}`)}
-                  >
-                    Editar
-                  </button>
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        onClick={() => navigate(`/dashboard-admin/turistas/edit/${t.id_turista}`)}
+                      >
+                        <i className="bi bi-pencil"></i>
+                      </Button>
 
-                  <button
-                    className="btn btn-outline-danger btn-sm"
-                    onClick={() => handleDelete(t.id_turista)}
-                  >
-                    Eliminar
-                  </button>
+                      <Button
+                        variant="outline-danger"
+                        size="sm"
+                        onClick={() => handleDelete(t.id_turista)}
+                      >
+                        <i className="bi bi-trash"></i>
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center text-muted py-3">
+                  No hay turistas registrados
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5" className="text-center text-muted py-3">
-                No hay turistas registrados
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+            )}
+          </tbody>
+        </Table>
+      </Card.Body>
+    </Card>
   );
 }

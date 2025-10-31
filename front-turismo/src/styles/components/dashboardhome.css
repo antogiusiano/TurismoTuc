@@ -1,145 +1,160 @@
-/* ====== PANEL GENERAL ====== */
-.dashboard-container {
-  background: #f5f6fa;
+/* Layout Principal */
+.app-wrapper {
+  display: flex;
   min-height: 100vh;
-  padding: 60px;
-  font-family: "Inter", "Segoe UI", sans-serif;
-  color: #333;
-  transition: all 0.3s ease;
+  background-color: #f5f6fa;
 }
 
-/* Margen lateral para el contenido (por el sidebar fijo) */
-@media (min-width: 992px) {
-  .dashboard-container {
-    margin-left: 230px; /* 👈 igual al width del sidebar */
-  }
+.main-content {
+  flex: 1;
+  margin-left: 230px;
+  padding: 2rem;
 }
 
-/* ====== TÍTULO PRINCIPAL ====== */
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Dashboard Header */
 .dashboard-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
 }
 
 .dashboard-header h3 {
-  color: #198754;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  font-size: 1.9rem;
+  color: #0e7667;
+  font-weight: 600;
 }
 
 .dashboard-header p {
   color: #6c757d;
-  margin-top: 5px;
-  font-size: 0.95rem;
 }
 
-/* ====== MÉTRICAS ====== */
+/* Métricas */
+.metrics-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
 .metric-card {
   background: white;
-  border-radius: 14px;
-  border: none;
-  padding: 25px 10px;
-  transition: all 0.25s ease-in-out;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  height: 100%;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .metric-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .metric-title {
-  font-size: 0.95rem;
   color: #6c757d;
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-bottom: 5px;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 }
 
 .metric-value {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: #212529;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #0e7667;
 }
 
-/* ====== TABLAS ====== */
+/* Tablas */
 .card {
-  border: none;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
-  background-color: #fff;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 2rem;
 }
 
 .card-header {
-  font-weight: 700 !important;
-  font-size: 1rem !important;
-  padding: 14px 20px;
-  border-bottom: none;
+  background: white;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h5 {
+  color: #0e7667;
+  margin: 0;
 }
 
 .table {
-  margin-bottom: 0;
+  margin: 0;
 }
 
-.table thead {
-  background-color: #f1f3f5;
+.table thead th {
+  background: #f8f9fa;
   color: #495057;
-  font-size: 0.9rem;
   font-weight: 600;
+  border-bottom: 2px solid #e9ecef;
 }
 
 .table tbody tr:hover {
   background-color: #f8f9fa;
 }
 
-/* ====== BADGES ====== */
+/* Estados y Badges */
 .badge {
+  padding: 0.5em 0.75em;
+  font-weight: 500;
   border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-transform: capitalize;
 }
 
-/* ====== RESPONSIVE ====== */
-@media (max-width: 992px) {
-  .dashboard-container {
-    margin-left: 0;
-    padding: 20px;
-  }
-
-  .metric-card {
-    margin-bottom: 15px;
-  }
+.badge-confirmada {
+  background-color: #0e7667;
+  color: white;
 }
 
-/* ====== AJUSTE DE CENTRADO ====== */
-.dashboard-content {
-  width: 100%;
-  max-width: 100%; /* ✅ elimina límite de 1400px */
-  margin: 0 auto;
-  padding-right: 2rem;
-  padding-left: 2rem;
+.badge-pendiente {
+  background-color: #ffc107;
+  color: #000;
 }
 
-/* Centrar realmente las tablas y métricas */
-.dashboard-container {
+/* Loading y Error States */
+.loading-spinner {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  min-height: 200px;
 }
 
-.dashboard-container > * {
-  width: 100%;
-  max-width: 1200px; /* 👈 ancho visual ideal para pantallas grandes */
+.error-message {
+  text-align: center;
+  color: #dc3545;
+  padding: 2rem;
 }
 
-/* Si querés que las tablas usen todo el ancho posible */
-@media (min-width: 1400px) {
-  .dashboard-container > * {
-    max-width: 1400px;
+/* Responsive */
+@media (max-width: 992px) {
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  
+  .metrics-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .metric-card {
+    padding: 1rem;
+  }
+  
+  .metric-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .card-header {
+    padding: 1rem;
+  }
+  
+  .table {
+    font-size: 0.875rem;
   }
 }
