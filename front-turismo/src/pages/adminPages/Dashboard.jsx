@@ -24,7 +24,6 @@ const Dashboard = () => {
             <Route path="reservas/*" element={<ReservasCRUD />} />
             <Route path="reseñas/*" element={<ReseñasCRUD />} />
             <Route path="usuarios/*" element={<UsuariosCRUD />} />
-            
             <Route index element={<DashboardHome />} />
           </Routes>
         </main>
