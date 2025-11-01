@@ -1,11 +1,12 @@
-/* Reset / base */
 .login-page {
-  min-height: calc(100vh - 72px); /* deja espacio para header si lo tenés */
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #f5f6fa;
-  padding: 2rem;
+  padding: 2rem 0;
+  box-sizing: border-box;
+  overflow: hidden; /* Añadimos esto para controlar el scroll */
 }
 
 /* Card */
@@ -17,6 +18,8 @@
   box-shadow: 0 8px 30px rgba(14, 118, 103, 0.08);
   padding: 28px;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
 /* Brand */

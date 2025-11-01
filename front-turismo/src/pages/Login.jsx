@@ -54,10 +54,13 @@ export default function Login() {
   };
 
   return (
-    <Container className="d-flex align-items-center justify-content-center" style={{ minHeight: "80vh" }}>
+    <Container fluid className="p-0" style={{ overflow: 'hidden' }}>
+    <div className="login-page">
       <Row className="justify-content-center w-100">
         <Col xs={12} md={6} lg={4}>
+        <br />
           <Card className="shadow">
+            
             <Card.Body className="p-4">
               <h4 className="text-center text-success fw-bold mb-4">Inicio de sesión</h4>
 
@@ -93,6 +96,7 @@ export default function Login() {
           </Card>
         </Col>
       </Row>
+      </div>
     </Container>
   );
 }

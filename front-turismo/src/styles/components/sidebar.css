@@ -73,3 +73,14 @@
   color: #0e7667;
   transform: translateX(5px);
 }
+.sidebar-header {
+  transition: all 0.3s ease;
+}
+
+.sidebar-header:hover {
+  transform: translateY(-2px);
+}
+
+.sidebar-header:hover svg {
+  transform: scale(1.1);
+}

@@ -5,6 +5,9 @@ import Footer from "./Components/common/Footer";
 import Home from "./pages/publicPages/Home";
 import Login from "./pages/Login";
 import Dashboard from "./pages/adminPages/Dashboard";
+import Catalogo from "./pages/publicPages/Catalogo";
+import DetalleExcursion from "./pages/publicPages/DetalleExcursion";
+
 import Error from "./pages/Error";
 import ProtectedRoute from "./Components/ProtectedRoute";
 
@@ -23,7 +26,27 @@ function App() {
             </>
           }
         />
-
+        <Route
+          path="/catalogo"
+          element={
+            <>
+              <Header />
+              <Catalogo />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/excursion/:id"
+          element={
+            <>
+              <Header />
+              <DetalleExcursion />
+              <Footer />
+            </>
+          }
+        />
+        
         <Route
           path="/admin"
           element={

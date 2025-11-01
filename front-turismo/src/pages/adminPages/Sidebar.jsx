@@ -31,9 +31,10 @@ export default function Sidebar() {
     <div className="sidebar bg-white shadow-sm d-flex flex-column">
       <hr />
       <br />
-      <Link to="/dashboard-admin" className="sidebar-header fw-bold text-success mb-3 d-block text-decoration-none">
-        <FaHome className="me-2" size={24} /> INICIO PANEL ADMIN
-      </Link>
+      <Link to="/dashboard-admin" className="sidebar-header fw-bold text-success mb-3 d-block text-decoration-none text-center">
+      <FaHome size={32} className="d-block mx-auto mb-2" />
+      INICIO PANEL ADMIN
+    </Link>
       
       <nav>
         <ul className="nav flex-column">
