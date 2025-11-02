@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { Card, Button, Table, Dropdown, Spinner, Alert } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -101,141 +100,329 @@ export default function ReservasMain() {
     return <div className="text-center mt-3">Cargando reservas...</div>;
   if (error) return <div className="alert alert-danger mt-3">{error}</div>;
 
-return (
-  <Card className="shadow-sm">
-    <Card.Body className="p-3">
+  return (
+    <div className="card shadow-sm p-3 mt-5">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="fw-bold text-success mb-0">Gestión de Reservas</h5>
 
-        <div className="d-flex align-items-center gap-2">
-          <Button 
-            as={Link} 
+        <div className="d-flex gap-2">
+          {/*Botón Crear Reserva */}
+          <Link
             to="/dashboard-admin/reservas/create"
-            variant="success"
-            size="sm"
+            className="btn btn-success"
           >
             <i className="bi bi-plus-circle me-1"></i> Crear Reserva
-          </Button>
+          </Link>
 
-          <Dropdown align="end">
-            <Dropdown.Toggle variant="outline-primary" size="sm">
-              <i className="bi bi-funnel"></i> Filtrar reservas
-            </Dropdown.Toggle>
+          {/*Dropdown de filtros (activas / eliminadas / todas) */}
+          <div className="dropdown">
+            <button
+              className="btn btn-outline-primary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="bi bi-funnel"></i> Filtrar activas
+            </button>
+            <ul className="dropdown-menu dropdown-menu-end">
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setFiltro("activas")}
+                >
+                  <i className="bi bi-check-circle text-success me-2"></i>
+                  Activas
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setFiltro("eliminadas")}
+                >
+                  <i className="bi bi-x-circle text-danger me-2"></i>Eliminadas
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setFiltro("todas")}
+                >
+                  <i className="bi bi-list-ul text-secondary me-2"></i>Todas
+                </button>
+              </li>
+            </ul>
+          </div>
 
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => setFiltro("activas")}>
-                <i className="bi bi-check-circle text-success me-2"></i>
-                Activas
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => setFiltro("eliminadas")}>
-                <i className="bi bi-x-circle text-danger me-2"></i>
-                Eliminadas
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => setFiltro("todas")}>
-                <i className="bi bi-list-ul text-secondary me-2"></i>
-                Todas
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          {/*Nuevo filtro por estado_reserva */}
+          <div className="dropdown">
+            <button
+              className="btn btn-outline-primary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i className="bi bi-funnel"></i> Filtrar estado
+            </button>
+            <ul className="dropdown-menu dropdown-menu-end">
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setEstadoreserva("pendiente")}
+                >
+                  <i className="bi bi-hourglass-split text-warning me-2"></i>
+                  Pendientes
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setEstadoreserva("confirmada")}
+                >
+                  <i className="bi bi-check-circle text-success me-2"></i>
+                  Confirmadas
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setEstadoreserva("cancelada")}
+                >
+                  <i className="bi bi-x-circle text-danger me-2"></i>
+                  Canceladas
+                </button>
+              </li>
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => setEstadoreserva("todas")}
+                >
+                  <i className="bi bi-list-ul text-secondary me-2"></i>
+                  Todas
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          {/* Filtro de fechas */}
+          <div className="dropdown">
+            <button
+              className="btn btn-outline-primary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              data-bs-auto-close="outside"
+            >
+              <i className="bi bi-calendar-range"></i> Filtrar por fecha
+            </button>
+
+            <ul className="dropdown-menu p-3" style={{ minWidth: "280px" }}>
+              {/* Opción: Este mes */}
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    const hoy = new Date();
+                    const primerDia = new Date(
+                      hoy.getFullYear(),
+                      hoy.getMonth(),
+                      1
+                    )
+                      .toISOString()
+                      .split("T")[0];
+                    const ultimoDia = new Date(
+                      hoy.getFullYear(),
+                      hoy.getMonth() + 1,
+                      0
+                    )
+                      .toISOString()
+                      .split("T")[0];
+                    setFechaDesde(primerDia);
+                    setFechaHasta(ultimoDia);
+                    getReservas();
+                  }}
+                >
+                  <i className="bi bi-calendar-month text-primary me-2"></i>{" "}
+                  Este mes
+                </button>
+              </li>
+
+              {/* Opción: Este año */}
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={() => {
+                    const hoy = new Date();
+                    const primerDia = `${hoy.getFullYear()}-01-01`;
+                    const ultimoDia = `${hoy.getFullYear()}-12-31`;
+                    setFechaDesde(primerDia);
+                    setFechaHasta(ultimoDia);
+                    getReservas();
+                  }}
+                >
+                  <i className="bi bi-calendar3 text-success me-2"></i> Este año
+                </button>
+              </li>
+
+              <li>
+                <hr className="dropdown-divider" />
+              </li>
+
+              {/* Filtro personalizado */}
+              <li>
+                <button
+                  className="dropdown-item"
+                  onClick={(e) => {
+                    e.stopPropagation(); // evita que bootstrap cierre el dropdown
+                    setOpenCalendar(!openCalendar);
+                  }}
+                >
+                  Personalizado
+                </button>
+              </li>
+
+              {openCalendar && (
+                <div className="p-2">
+                  <label>Desde:</label>
+                  <DatePicker
+                    selected={temporalDesde}
+                    onChange={(date) => setTemporalDesde(date)}
+                    dateFormat="yyyy-MM-dd"
+                    className="form-control mb-2"
+                    placeholderText="Fecha inicio"
+                  />
+
+                  <label>Hasta:</label>
+                  <DatePicker
+                    selected={temporalHasta}
+                    onChange={(date) => setTemporalHasta(date)}
+                    dateFormat="yyyy-MM-dd"
+                    className="form-control mb-2"
+                    placeholderText="Fecha fin"
+                  />
+
+                  <button
+                    className="btn btn-primary w-100"
+                    onClick={() => {
+                      if (temporalDesde)
+                        setFechaDesde(
+                          temporalDesde.toISOString().split("T")[0]
+                        );
+                      if (temporalHasta)
+                        setFechaHasta(
+                          temporalHasta.toISOString().split("T")[0]
+                        );
+                      getReservas();
+                      setOpenCalendar(false);
+                    }}
+                  >
+                    Aplicar
+                  </button>
+                </div>
+              )}
+
+              <button
+                className="btn btn-outline-secondary"
+                onClick={() => {
+                  setFechaDesde("");
+                  setFechaHasta("");
+                  setTemporalDesde(null);
+                  setTemporalHasta(null);
+                  getReservas();
+                  setOpenCalendar(false);
+                }}
+              >
+                Limpiar
+              </button>
+            </ul>
+          </div>
         </div>
       </div>
 
-      {loading ? (
-        <div className="text-center py-4">
-          <Spinner animation="border" variant="success" />
-        </div>
-      ) : error ? (
-        <Alert variant="danger">{error}</Alert>
-      ) : (
-        <Table hover responsive className="align-middle">
-          <thead className="table-light">
-            <tr>
-              <th>ID</th>
-              <th>Turista</th>
-              <th>Excursión</th>
-              <th>Fecha Excursión</th>
-              <th>Cantidad</th>
-              <th>Monto Total</th>
-              <th>Estado</th>
-              <th>Fecha Reserva</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reservas.length > 0 ? (
-              reservas.map((r) => (
-                <tr key={r.id_reserva}>
-                  <td>{r.id_reserva}</td>
-                  <td>{r.turista}</td>
-                  <td>{r.excursion}</td>
-                  <td>{new Date(r.fecha_excursion).toLocaleDateString()}</td>
-                  <td>{r.cantidad_personas}</td>
-                  <td>${parseFloat(r.monto_total).toFixed(2)}</td>
-                  <td>
-                    <span
-                      className={`badge ${
-                        r.estado_reserva === "confirmada"
-                          ? "bg-success"
-                          : r.estado_reserva === "pendiente"
-                          ? "bg-warning"
-                          : "bg-danger"
-                      }`}
+      <table className="table table-hover align-middle">
+        <thead className="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Turista</th>
+            <th>Excursión</th>
+            <th>Fecha Excursión</th>
+            <th>Cantidad</th>
+            <th>Monto Total</th>
+            <th>Estado</th>
+            <th>Fecha Reserva</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {reservas.length > 0 ? (
+            reservas.map((r) => (
+              <tr key={r.id_reserva}>
+                <td>{r.id_reserva}</td>
+                <td>{r.turista}</td>
+                <td>{r.excursion}</td>
+                <td>{new Date(r.fecha_excursion).toLocaleDateString()}</td>
+                <td>{r.cantidad_personas}</td>
+                <td>${parseFloat(r.monto_total).toFixed(2)}</td>
+                <td>
+                  <span
+                    className={`badge ${
+                      r.estado_reserva === "confirmada"
+                        ? "bg-success"
+                        : r.estado_reserva === "pendiente"
+                        ? "bg-warning"
+                        : "bg-danger"
+                    }`}
+                  >
+                    {r.estado_reserva}
+                  </span>
+                </td>
+                <td>{new Date(r.fecha_reserva).toLocaleDateString()}</td>
+                <td>
+                  <div className="btn-group" role="group">
+                    {/*  Ver */}
+                    <Link
+                      to={`/dashboard-admin/reservas/view/${r.id_reserva}`}
+                      className="btn btn-outline-secondary btn-sm"
                     >
-                      {r.estado_reserva}
-                    </span>
-                  </td>
-                  <td>{new Date(r.fecha_reserva).toLocaleDateString()}</td>
-                  <td>
-                    <div className="btn-group" role="group">
-                      <Button
-                        as={Link}
-                        to={`/dashboard-admin/reservas/view/${r.id_reserva}`}
-                        variant="outline-secondary"
-                        size="sm"
-                      >
-                        <i className="bi bi-eye"></i>
-                      </Button>
+                      <i className="bi bi-eye"></i>
+                    </Link>
 
-                      <Button
-                        as={Link}
-                        to={`/dashboard-admin/reservas/edit/${r.id_reserva}`}
-                        variant="outline-primary"
-                        size="sm"
-                      >
-                        <i className="bi bi-pencil"></i>
-                      </Button>
+                    {/*  Editar */}
+                    <Link
+                      to={`/dashboard-admin/reservas/edit/${r.id_reserva}`}
+                      className="btn btn-outline-primary btn-sm"
+                    >
+                      <i className="bi bi-pencil"></i>
+                    </Link>
 
-                      {r.eliminado ? (
-                        <Button
-                          variant="outline-success"
-                          size="sm"
-                          onClick={() => handleRestore(r.id_reserva)}
-                        >
-                          <i className="bi bi-arrow-counterclockwise"></i>
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => handleDelete(r.id_reserva)}
-                        >
-                          <i className="bi bi-trash"></i>
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center text-muted py-3">
-                  No hay reservas registradas
+                    {/*  Eliminar o  Restaurar */}
+                    {r.eliminado ? (
+                      <button
+                        className="btn btn-outline-success btn-sm"
+                        onClick={() => handleRestore(r.id_reserva)}
+                      >
+                        <i className="bi bi-arrow-counterclockwise"></i>
+                      </button>
+                    ) : (
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => handleDelete(r.id_reserva)}
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
-            )}
-          </tbody>
-        </Table>
-      )}
-    </Card.Body>
-  </Card>
-)}
+            ))
+          ) : (
+            <tr>
+              <td colSpan="9" className="text-center text-muted py-3">
+                No hay reservas registradas
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
