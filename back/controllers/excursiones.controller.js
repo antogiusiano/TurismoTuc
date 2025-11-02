@@ -6,13 +6,44 @@ import { pool } from "../config/DB.js";
 // =============================
 // Obtener todas las excursiones
 export const getExcursiones = (req, res) => {
-  const sql = `SELECT id_excursion, titulo, descripcion, precio_base, duracion, 
-                      ubicacion, incluye, politicas, estado, fecha_creacion
-               FROM Excursiones
-               WHERE eliminado = 0
-               ORDER BY fecha_creacion DESC`;
+  const { ubicacion, precio_min, precio_max, duracion, estado } = req.query;
 
-  pool.query(sql, (err, results) => {
+  let sql = `
+    SELECT id_excursion, titulo, descripcion, precio_base, duracion, 
+           ubicacion, incluye, politicas, estado, fecha_creacion
+    FROM Excursiones
+    WHERE eliminado = 0
+  `;
+  const values = [];
+
+  if (ubicacion) {
+    sql += " AND ubicacion LIKE ?";
+    values.push(`%${ubicacion}%`);
+  }
+
+  if (duracion) {
+    sql += " AND duracion LIKE ?";
+    values.push(`%${duracion}%`);
+  }
+
+  if (precio_min) {
+    sql += " AND precio_base >= ?";
+    values.push(precio_min);
+  }
+
+  if (precio_max) {
+    sql += " AND precio_base <= ?";
+    values.push(precio_max);
+  }
+
+  if (estado) {
+    sql += " AND estado = ?";
+    values.push(estado);
+  }
+
+  sql += " ORDER BY fecha_creacion DESC";
+
+  pool.query(sql, values, (err, results) => {
     if (err) {
       console.error("Error al obtener excursiones:", err);
       return res.status(500).json({ message: "Error al obtener excursiones" });
@@ -20,6 +51,7 @@ export const getExcursiones = (req, res) => {
     res.json(results);
   });
 };
+
 // Obtener una excursión por ID
 export const getExcursionById = (req, res) => {
   const { id } = req.params;

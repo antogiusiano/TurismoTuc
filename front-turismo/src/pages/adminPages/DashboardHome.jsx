@@ -32,70 +32,84 @@ export default function DashboardHome() {
     fetchDashboardData();
   }, []);
 
-  if (loading) {
+  if (loading)
     return (
       <div className="text-center mt-5">
         <Spinner animation="border" variant="success" />
         <p className="text-muted mt-2">Cargando panel...</p>
       </div>
     );
-  }
 
-  if (error) {
+  if (error)
     return <div className="alert alert-danger text-center mt-4">{error}</div>;
-  }
 
   return (
-    <div className="container mt-4">
-      <br />
-      <h3 className="fw-bold text-success mb-4 mt-4 pt-3">  👋 Bienvenido al Panel de Administración </h3>
+    <div className="dashboard-content container-fluid mt-4">
+      <div className="text-center mb-4">
+        <h3 className="fw-bold text-success mb-3">
+          👋 Bienvenido al Panel de Administración
+        </h3>
+        <p className="text-muted mb-0">
+          Aquí podés ver un resumen general de la actividad del sistema.
+        </p>
+      </div>
 
-      {/* MÉTRICAS */}
-      <div className="row mb-4">
-        <div className="col-md-3 mb-3">
-          <Card className="shadow-sm text-center border-success">
-            <Card.Body>
-              <Card.Title>Reservas Hoy</Card.Title>
-              <h2 className="fw-bold text-success">{metricas?.reservas_hoy || 0}</h2>
+      {/* --- MÉTRICAS --- */}
+      <div className="row g-4 mb-4">
+        <div className="col-md-3 col-sm-6">
+          <Card className="shadow border-0">
+            <Card.Body className="text-center">
+              <h6 className="fw-bold text-secondary">Reservas Hoy</h6>
+              <h2 className="fw-bold text-success">
+                {metricas?.reservas_hoy || 0}
+              </h2>
             </Card.Body>
           </Card>
         </div>
 
-        <div className="col-md-3 mb-3">
-          <Card className="shadow-sm text-center border-primary">
-            <Card.Body>
-              <Card.Title>Próximas Reservas</Card.Title>
-              <h2 className="fw-bold text-primary">{metricas?.reservas_proximas || 0}</h2>
+        <div className="col-md-3 col-sm-6">
+          <Card className="shadow border-0">
+            <Card.Body className="text-center">
+              <h6 className="fw-bold text-secondary">Próximas Reservas</h6>
+              <h2 className="fw-bold text-primary">
+                {metricas?.reservas_proximas || 0}
+              </h2>
             </Card.Body>
           </Card>
         </div>
 
-        <div className="col-md-3 mb-3">
-          <Card className="shadow-sm text-center border-warning">
-            <Card.Body>
-              <Card.Title>Ocupación Total</Card.Title>
-              <h2 className="fw-bold text-warning">{metricas?.ocupacion || 0}%</h2>
+        <div className="col-md-3 col-sm-6">
+          <Card className="shadow border-0">
+            <Card.Body className="text-center">
+              <h6 className="fw-bold text-secondary">Ocupación Total</h6>
+              <h2 className="fw-bold text-warning">
+                {metricas?.ocupacion || 0}%
+              </h2>
             </Card.Body>
           </Card>
         </div>
 
-        <div className="col-md-3 mb-3">
-          <Card className="shadow-sm text-center border-info">
-            <Card.Body>
-              <Card.Title>Rating Promedio</Card.Title>
-              <h2 className="fw-bold text-info">{metricas?.rating_promedio || 0}</h2>
+        <div className="col-md-3 col-sm-6">
+          <Card className="shadow border-0">
+            <Card.Body className="text-center">
+              <h6 className="fw-bold text-secondary">Rating Promedio</h6>
+              <h2 className="fw-bold text-info">
+                {metricas?.rating_promedio || 0}
+              </h2>
             </Card.Body>
           </Card>
         </div>
       </div>
 
-      {/* TABLA DE RESERVAS DEL DÍA */}
+      {/* --- RESERVAS DE HOY --- */}
       <Card className="shadow-sm mb-4">
-        <Card.Header className="bg-success text-white fw-bold">Reservas de Hoy</Card.Header>
-        <Card.Body>
+        <Card.Header className="bg-success text-white fw-bold">
+          Reservas de Hoy
+        </Card.Header>
+        <Card.Body className="p-0">
           {reservasHoy.length > 0 ? (
-            <Table hover responsive>
-              <thead>
+            <Table hover responsive className="m-0">
+              <thead className="table-light">
                 <tr>
                   <th>#</th>
                   <th>Turista</th>
@@ -113,7 +127,7 @@ export default function DashboardHome() {
                     <td>{r.cantidad_personas}</td>
                     <td>
                       <span
-                        className={`badge ${
+                        className={`badge px-3 py-2 ${
                           r.estado_reserva === "confirmada"
                             ? "bg-success"
                             : r.estado_reserva === "pendiente"
@@ -129,19 +143,21 @@ export default function DashboardHome() {
               </tbody>
             </Table>
           ) : (
-            <p className="text-muted text-center m-0">No hay reservas para hoy.</p>
+            <p className="text-muted text-center m-3">
+              No hay reservas para hoy.
+            </p>
           )}
         </Card.Body>
       </Card>
 
-      {/* CALENDARIO DE RESERVAS FUTURAS */}
-      <Card className="shadow-sm">
+      {/* --- PRÓXIMAS RESERVAS --- */}
+      <Card className="shadow-sm mb-5">
         <Card.Header className="bg-primary text-white fw-bold">
           Próximas Reservas
         </Card.Header>
         <Card.Body>
           {reservasFuturas.length > 0 ? (
-            <ul className="list-group">
+            <ul className="list-group list-group-flush">
               {reservasFuturas.map((r, i) => (
                 <li
                   key={i}
@@ -152,7 +168,9 @@ export default function DashboardHome() {
                     <br />
                     <small className="text-muted">{r.turista}</small>
                   </span>
-                  <span className="badge bg-success">🚌 {r.cantidad_personas} pers.</span>
+                  <span className="badge bg-success">
+                    🚌 {r.cantidad_personas} pers.
+                  </span>
                 </li>
               ))}
             </ul>
