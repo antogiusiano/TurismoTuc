@@ -7,16 +7,35 @@ import { pool } from "../config/DB.js";
 
 // Obtener las reservas con información relacionada y filtro
 export const getReservas = (req, res) => {
-  const { filtro } = req.query; // puede ser: 'activas', 'eliminadas', 'todas'
-  //console.log("📩 Filtro recibido:", filtro);
-  //console.log("📩 URL recibida:", req.originalUrl);
-  //console.log("📩 Query:", req.query);
-  let condicion = "";
-  if (filtro === "activas") {
-    condicion = "WHERE r.eliminado = 0";
-  } else if (filtro === "eliminadas") {
-    condicion = "WHERE r.eliminado = 1";
-  } // si es 'todas', no agrega WHERE
+  console.log("Query recibida:", req.query);
+
+  const { filtro, estadoreserva, fechaDesde, fechaHasta } = req.query;
+  const condiciones = [];
+
+  // Filtro por activas/eliminadas
+  if (filtro === "activas") condiciones.push("r.eliminado = 0");
+  if (filtro === "eliminadas") condiciones.push("r.eliminado = 1");
+
+  // Filtro por estado de reserva
+  if (estadoreserva && estadoreserva !== "todas") {
+    condiciones.push(`r.estado_reserva = '${estadoreserva}'`);
+  }
+
+  // Filtro por fecha (maneja todas las combinaciones)
+  if (fechaDesde && fechaHasta) {
+    condiciones.push(
+      `DATE(r.fecha_reserva) BETWEEN '${fechaDesde}' AND '${fechaHasta}'`
+    );
+  } else if (fechaDesde) {
+    condiciones.push(`DATE(r.fecha_reserva) >= '${fechaDesde}'`);
+  } else if (fechaHasta) {
+    condiciones.push(`DATE(r.fecha_reserva) <= '${fechaHasta}'`);
+  }
+
+  console.log("Condiciones generadas:", condiciones);
+
+  const whereClause =
+    condiciones.length > 0 ? `WHERE ${condiciones.join(" AND ")}` : "";
 
   const sql = `
     SELECT 
@@ -33,9 +52,11 @@ export const getReservas = (req, res) => {
     JOIN Turistas t ON r.id_turista = t.id_turista
     JOIN FechasExcursion f ON r.id_fecha = f.id_fecha
     JOIN Excursiones e ON f.id_excursion = e.id_excursion
-    ${condicion}
+    ${whereClause}
     ORDER BY r.fecha_reserva DESC;
   `;
+
+  console.log("SQL generada:", sql);
 
   pool.query(sql, (err, results) => {
     if (err) {
@@ -45,7 +66,6 @@ export const getReservas = (req, res) => {
     res.json(results);
   });
 };
-
 
 // Obtener reserva por ID
 export const getReservaById = (req, res) => {
@@ -96,7 +116,9 @@ export const createReserva = (req, res) => {
       console.error("Error al crear reserva:", err);
       return res.status(500).json({ message: "Error al crear reserva" });
     }
-    res.status(201).json({ message: "Reserva creada correctamente", id: result.insertId });
+    res
+      .status(201)
+      .json({ message: "Reserva creada correctamente", id: result.insertId });
   });
 };
 
@@ -160,7 +182,6 @@ export const restoreReserva = (req, res) => {
   });
 };
 
-
 // =============================
 // PAGOS
 // =============================
@@ -204,14 +225,22 @@ export const createPago = (req, res) => {
     INSERT INTO Pagos (id_reserva, id_medio_pago, monto, estado_pago, moneda)
     VALUES (?, ?, ?, ?, ?)
   `;
-  const values = [id_reserva, id_medio_pago, monto, estado_pago || "pendiente", moneda || "ARS"];
+  const values = [
+    id_reserva,
+    id_medio_pago,
+    monto,
+    estado_pago || "pendiente",
+    moneda || "ARS",
+  ];
 
   pool.query(sql, values, (err, result) => {
     if (err) {
       console.error("Error al registrar pago:", err);
       return res.status(500).json({ message: "Error al registrar pago" });
     }
-    res.status(201).json({ message: "Pago registrado correctamente", id: result.insertId });
+    res
+      .status(201)
+      .json({ message: "Pago registrado correctamente", id: result.insertId });
   });
 };
 
