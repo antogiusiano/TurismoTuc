@@ -3,23 +3,43 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Card, Button, Table, Dropdown, Spinner, Alert } from "react-bootstrap";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function ReservasMain() {
   const [reservas, setReservas] = useState([]);
   const [filtro, setFiltro] = useState("activas"); // 'activas', 'eliminadas' o 'todas' como filtros
+  const [estadoreserva, setEstadoreserva] = useState("todas"); // 'pendiente', 'confirmada', 'cancelada' o 'todas'
+  const [fechaDesde, setFechaDesde] = useState("");
+  const [fechaHasta, setFechaHasta] = useState("");
+  const [temporalDesde, setTemporalDesde] = useState(
+    fechaDesde ? new Date(fechaDesde) : null
+  );
+  const [temporalHasta, setTemporalHasta] = useState(
+    fechaHasta ? new Date(fechaHasta) : null
+  );
+  const [openCalendar, setOpenCalendar] = useState(false); // para mostrar/ocultar el calendario
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
 
   const getReservas = async () => {
     setLoading(true);
     setError(null);
+    const params = {
+      filtro,
+      estadoreserva,
+      fechaDesde,
+      fechaHasta,
+    };
     try {
-      const res = await axios.get(
-        `http://localhost:8000/api/reservas?filtro=${filtro}`
-      );
-      console.log("Actual:", filtro);
-      console.log("reponse:", res.data);
+      const res = await axios.get("http://localhost:8000/api/reservas", {
+        params,
+      });
+
+      console.log("Actual filtro:", filtro);
+      console.log("Actual estado:", estadoreserva);
+      //console.log("reponse:", res.data);
       setReservas(res.data);
     } catch (err) {
       console.error("Error al obtener reservas:", err);
@@ -31,7 +51,7 @@ export default function ReservasMain() {
 
   useEffect(() => {
     getReservas();
-  }, [filtro]);
+  }, [filtro, estadoreserva]);
 
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
@@ -81,52 +101,190 @@ export default function ReservasMain() {
     return <div className="text-center mt-3">Cargando reservas...</div>;
   if (error) return <div className="alert alert-danger mt-3">{error}</div>;
 
-return (
-  <Card className="shadow-sm">
-    <Card.Body className="p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="fw-bold text-success mb-0">Gestión de Reservas</h5>
+  return (
+    <Card className="shadow-sm mt-5">
+      <Card.Body className="p-3">
+        {/* Encabezado */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="fw-bold text-success mb-0">Gestión de Reservas</h5>
 
-        <div className="d-flex align-items-center gap-2">
-          <Button 
-            as={Link} 
-            to="/dashboard-admin/reservas/create"
-            variant="success"
-            size="sm"
-          >
-            <i className="bi bi-plus-circle me-1"></i> Crear Reserva
-          </Button>
+          <div className="d-flex align-items-center gap-2">
+            {/* Botón Crear Reserva */}
+            <Button
+              as={Link}
+              to="/dashboard-admin/reservas/create"
+              variant="success"
+              size="sm"
+            >
+              <i className="bi bi-plus-circle me-1"></i> Crear Reserva
+            </Button>
 
-          <Dropdown align="end">
-            <Dropdown.Toggle variant="outline-primary" size="sm">
-              <i className="bi bi-funnel"></i> Filtrar reservas
-            </Dropdown.Toggle>
+            {/* Dropdown: Filtrar activas / eliminadas / todas */}
+            <Dropdown align="end">
+              <Dropdown.Toggle variant="outline-primary" size="sm">
+                <i className="bi bi-funnel"></i> Filtrar activas
+              </Dropdown.Toggle>
 
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => setFiltro("activas")}>
-                <i className="bi bi-check-circle text-success me-2"></i>
-                Activas
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => setFiltro("eliminadas")}>
-                <i className="bi bi-x-circle text-danger me-2"></i>
-                Eliminadas
-              </Dropdown.Item>
-              <Dropdown.Item onClick={() => setFiltro("todas")}>
-                <i className="bi bi-list-ul text-secondary me-2"></i>
-                Todas
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => setFiltro("activas")}>
+                  <i className="bi bi-check-circle text-success me-2"></i>
+                  Activas
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setFiltro("eliminadas")}>
+                  <i className="bi bi-x-circle text-danger me-2"></i>
+                  Eliminadas
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setFiltro("todas")}>
+                  <i className="bi bi-list-ul text-secondary me-2"></i>
+                  Todas
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+
+            {/* Dropdown: Filtro por estado_reserva */}
+            <Dropdown align="end">
+              <Dropdown.Toggle variant="outline-primary" size="sm">
+                <i className="bi bi-funnel"></i> Filtrar estado
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => setEstadoreserva("pendiente")}>
+                  <i className="bi bi-hourglass-split text-warning me-2"></i>
+                  Pendientes
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setEstadoreserva("confirmada")}>
+                  <i className="bi bi-check-circle text-success me-2"></i>
+                  Confirmadas
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setEstadoreserva("cancelada")}>
+                  <i className="bi bi-x-circle text-danger me-2"></i>
+                  Canceladas
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setEstadoreserva("todas")}>
+                  <i className="bi bi-list-ul text-secondary me-2"></i>
+                  Todas
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+
+            {/* Dropdown: Filtro de fechas */}
+            <Dropdown align="end" autoClose="outside">
+              <Dropdown.Toggle variant="outline-primary" size="sm">
+                <i className="bi bi-calendar-range"></i> Filtrar por fecha
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu className="p-3" style={{ minWidth: "280px" }}>
+                <Dropdown.Item
+                  onClick={() => {
+                    const hoy = new Date();
+                    const primerDia = new Date(
+                      hoy.getFullYear(),
+                      hoy.getMonth(),
+                      1
+                    )
+                      .toISOString()
+                      .split("T")[0];
+                    const ultimoDia = new Date(
+                      hoy.getFullYear(),
+                      hoy.getMonth() + 1,
+                      0
+                    )
+                      .toISOString()
+                      .split("T")[0];
+                    setFechaDesde(primerDia);
+                    setFechaHasta(ultimoDia);
+                    getReservas();
+                  }}
+                >
+                  <i className="bi bi-calendar-month text-primary me-2"></i>{" "}
+                  Este mes
+                </Dropdown.Item>
+
+                <Dropdown.Item
+                  onClick={() => {
+                    const hoy = new Date();
+                    const primerDia = `${hoy.getFullYear()}-01-01`;
+                    const ultimoDia = `${hoy.getFullYear()}-12-31`;
+                    setFechaDesde(primerDia);
+                    setFechaHasta(ultimoDia);
+                    getReservas();
+                  }}
+                >
+                  <i className="bi bi-calendar3 text-success me-2"></i> Este año
+                </Dropdown.Item>
+
+                <Dropdown.Divider />
+
+                <Dropdown.Item
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenCalendar(!openCalendar);
+                  }}
+                >
+                  Personalizado
+                </Dropdown.Item>
+
+                {openCalendar && (
+                  <div className="p-2">
+                    <label>Desde:</label>
+                    <DatePicker
+                      selected={temporalDesde}
+                      onChange={(date) => setTemporalDesde(date)}
+                      dateFormat="yyyy-MM-dd"
+                      className="form-control mb-2"
+                      placeholderText="Fecha inicio"
+                    />
+
+                    <label>Hasta:</label>
+                    <DatePicker
+                      selected={temporalHasta}
+                      onChange={(date) => setTemporalHasta(date)}
+                      dateFormat="yyyy-MM-dd"
+                      className="form-control mb-2"
+                      placeholderText="Fecha fin"
+                    />
+
+                    <Button
+                      variant="primary"
+                      className="w-100 mb-2"
+                      onClick={() => {
+                        if (temporalDesde)
+                          setFechaDesde(
+                            temporalDesde.toISOString().split("T")[0]
+                          );
+                        if (temporalHasta)
+                          setFechaHasta(
+                            temporalHasta.toISOString().split("T")[0]
+                          );
+                        getReservas();
+                        setOpenCalendar(false);
+                      }}
+                    >
+                      Aplicar
+                    </Button>
+
+                    <Button
+                      variant="outline-secondary"
+                      className="w-100"
+                      onClick={() => {
+                        setFechaDesde("");
+                        setFechaHasta("");
+                        setTemporalDesde(null);
+                        setTemporalHasta(null);
+                        getReservas();
+                        setOpenCalendar(false);
+                      }}
+                    >
+                      Limpiar
+                    </Button>
+                  </div>
+                )}
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </div>
-      </div>
 
-      {loading ? (
-        <div className="text-center py-4">
-          <Spinner animation="border" variant="success" />
-        </div>
-      ) : error ? (
-        <Alert variant="danger">{error}</Alert>
-      ) : (
+        {/* Tabla de reservas */}
         <Table hover responsive className="align-middle">
           <thead className="table-light">
             <tr>
@@ -167,6 +325,7 @@ return (
                   <td>{new Date(r.fecha_reserva).toLocaleDateString()}</td>
                   <td>
                     <div className="btn-group" role="group">
+                      {/* Ver */}
                       <Button
                         as={Link}
                         to={`/dashboard-admin/reservas/view/${r.id_reserva}`}
@@ -176,6 +335,7 @@ return (
                         <i className="bi bi-eye"></i>
                       </Button>
 
+                      {/* Editar */}
                       <Button
                         as={Link}
                         to={`/dashboard-admin/reservas/edit/${r.id_reserva}`}
@@ -185,6 +345,7 @@ return (
                         <i className="bi bi-pencil"></i>
                       </Button>
 
+                      {/* Eliminar o Restaurar */}
                       {r.eliminado ? (
                         <Button
                           variant="outline-success"
@@ -215,7 +376,7 @@ return (
             )}
           </tbody>
         </Table>
-      )}
-    </Card.Body>
-  </Card>
-)}
+      </Card.Body>
+    </Card>
+  );
+}
