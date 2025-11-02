@@ -1,0 +1,76 @@
+.catalogo-page {
+  background-color: #f5f6fa;
+  min-height: calc(100vh - 72px - 200px); /* header + footer */
+}
+
+.experience-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.experience-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar filter styles */
+.filter-sidebar {
+  position: sticky;
+  top: 100px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 1px solid #e5e5e5;
+}
+
+.btn-teal {
+  background-color: #0e7667;
+  border: none;
+}
+
+.btn-teal:hover {
+  background-color: #095e53;
+}
+/* 🔒 Corrige el ancho del sidebar incluso en pantallas pequeñas */
+.filter-sidebar {
+  position: sticky;
+  top: 100px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 1px solid #e5e5e5;
+  width: 100%;
+}
+
+/* En pantallas grandes, el sidebar ocupa un ancho fijo */
+@media (min-width: 768px) {
+  .filter-sidebar {
+    max-width: 250px;
+  }
+}
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.catalogo-page {
+  background-color: #f5f6fa;
+  min-height: calc(100vh - 72px - 200px);
+}
+
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Estilo más alineado para el select de orden */
+.sort-bar {
+  margin-bottom: 0.5rem;
+}
+
+.sort-bar select {
+  width: 100%;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}

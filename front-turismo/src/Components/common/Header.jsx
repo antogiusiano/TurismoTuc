@@ -1,5 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
-import { FaWhatsapp, FaShoppingCart } from "react-icons/fa";
+import { FaWhatsapp, FaShoppingCart, FaUserCog, FaUserShield } from "react-icons/fa";
 import "../../styles/components/common/header.css";
 
 export default function Header() {
@@ -68,8 +68,8 @@ export default function Header() {
             <FaWhatsapp /> WhatsApp
           </a>
 
-          <NavLink className="nav-link ms-2" to="/admin">
-            Backoffice
+          <NavLink className="nav-link ms-2 text-secondary opacity-75 small d-flex align-items-center gap-1" to="/admin">
+            <FaUserCog size={24} /> 
           </NavLink>
         </div>
       </div>
