@@ -100,25 +100,81 @@ export const getReservaById = (req, res) => {
 
 // Crear nueva reserva
 export const createReserva = (req, res) => {
-  const { id_fecha, id_turista, cantidad_personas, monto_total } = req.body;
+  const { id_turista, id_fecha, cantidad_personas, estado_reserva } = req.body;
 
-  if (!id_fecha || !id_turista || !cantidad_personas || !monto_total)
+  // Validar datos obligatorios
+  if (!id_turista || !id_fecha || !cantidad_personas) {
     return res.status(400).json({ message: "Faltan datos obligatorios" });
+  }
 
-  const sql = `
-    INSERT INTO Reservas (id_fecha, id_turista, cantidad_personas, monto_total)
-    VALUES (?, ?, ?, ?)
+  // Primero obtener el precio de la excursión asociada a esta fecha y el cupo disponible
+  const sqlPrecio = `
+    SELECT e.precio_base, f.cupo_disponible
+    FROM FechasExcursion f
+    JOIN Excursiones e ON f.id_excursion = e.id_excursion
+    WHERE f.id_fecha = ? AND f.eliminado = 0
   `;
-  const values = [id_fecha, id_turista, cantidad_personas, monto_total];
 
-  pool.query(sql, values, (err, result) => {
+  pool.query(sqlPrecio, [id_fecha], (err, results) => {
     if (err) {
-      console.error("Error al crear reserva:", err);
-      return res.status(500).json({ message: "Error al crear reserva" });
+      console.error("Error al obtener precio de excursión:", err);
+      return res.status(500).json({ message: "Error al calcular monto total" });
     }
-    res
-      .status(201)
-      .json({ message: "Reserva creada correctamente", id: result.insertId });
+
+    if (results.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Fecha de excursión no encontrada" });
+    }
+
+    const precioBase = results[0].precio_base;
+    const cupoDisponible = results[0].cupo_disponible;
+
+    // Validar cupo disponible
+    if (cantidad_personas > cupoDisponible) {
+      return res
+        .status(400)
+        .json({ message: "No hay cupo suficiente para esta reserva" });
+    }
+
+    // Calcular el monto total y cupo nuevo
+    const monto_total = precioBase * cantidad_personas;
+    const nuevoCupo = cupoDisponible - cantidad_personas;
+
+    // Insertar la reserva
+    const sqlInsert = `
+      INSERT INTO Reservas
+      (id_fecha, id_turista, cantidad_personas, monto_total, estado_reserva)
+      VALUES (?, ?, ?, ?, ?)
+    `;
+
+    pool.query(
+      sqlInsert,
+      [
+        id_fecha,
+        id_turista,
+        cantidad_personas,
+        monto_total,
+        estado_reserva || "pendiente",
+      ],
+      (err2, result) => {
+        if (err2)
+          return res.status(500).json({ message: "Error al crear reserva" });
+
+        // Actualizar cupo disponible en FechasExcursion
+        const sqlUpdateCupo = `UPDATE FechasExcursion SET cupo_disponible = ? WHERE id_fecha = ?`;
+        pool.query(sqlUpdateCupo, [nuevoCupo, id_fecha], (err3) => {
+          if (err3) console.error("Error al actualizar cupo:", err3);
+
+          res.status(201).json({
+            message: "Reserva creada correctamente",
+            id_reserva: result.insertId,
+            monto_total,
+            nuevoCupo, // Devolvemos el nuevo cupo
+          });
+        });
+      }
+    );
   });
 };
 
