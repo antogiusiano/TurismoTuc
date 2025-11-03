@@ -14,10 +14,12 @@ export default function CreateExcursion() {
     politicas: "",
     estado: "activa",
     id_categoria_excursion: "",
+    id_guia: "", // ✅ nuevo campo
   });
 
   const [imagen, setImagen] = useState(null);
   const [categorias, setCategorias] = useState([]);
+  const [guias, setGuias] = useState([]); // ✅ lista de guías
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -54,14 +56,24 @@ export default function CreateExcursion() {
   useEffect(() => {
     const fetchCategorias = async () => {
       try {
-        // ✅ Ruta corregida
         const res = await axios.get("http://localhost:8000/api/excursiones/categorias-excursion");
         setCategorias(res.data);
       } catch (err) {
         console.error("Error al obtener categorías:", err);
       }
     };
+
+    const fetchGuias = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/api/excursiones/guias");
+        setGuias(res.data);
+      } catch (err) {
+        console.error("Error al obtener guías:", err);
+      }
+    };
+
     fetchCategorias();
+    fetchGuias();
   }, []);
 
   return (
@@ -110,6 +122,17 @@ export default function CreateExcursion() {
             {categorias.map((cat) => (
               <option key={cat.id_categoria_excursion} value={cat.id_categoria_excursion}>
                 {cat.nombre_categoria}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Guía asignado</label>
+          <select name="id_guia" className="form-select" value={form.id_guia} onChange={handleChange}>
+            <option value="">Seleccionar guía</option>
+            {guias.map((g) => (
+              <option key={g.id_usuario} value={g.id_usuario}>
+                {g.nombre} {g.apellido}
               </option>
             ))}
           </select>
