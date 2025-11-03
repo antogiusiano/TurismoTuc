@@ -8,13 +8,13 @@ export default function CreateReserva() {
 
   // Listas para selects
   const [turistas, setTuristas] = useState([]);
+  const [excursiones, setExcursiones] = useState([]);
   const [fechasExcursion, setFechasExcursion] = useState([]);
 
   const [reserva, setReserva] = useState({
     id_turista: "",
     id_fecha: "",
     cantidad_personas: 1,
-    monto_total: 0,
     estado_reserva: "pendiente",
   });
 
@@ -29,24 +29,54 @@ export default function CreateReserva() {
           axios.get("http://localhost:8000/api/excursiones"),
         ]);
         setTuristas(turistasRes.data);
-        setFechasExcursion(fechasRes.data);
+        setExcursiones(fechasRes.data);
       } catch (err) {
         console.error("Error cargando listas:", err);
-        Swal.fire("Error", "No se pudieron cargar turistas o excursiones", "error");
+        Swal.fire(
+          "Error",
+          "No se pudieron cargar turistas o excursiones",
+          "error"
+        );
       }
     };
     fetchData();
   }, []);
+
+  // Cuando cambia la excursión seleccionada → cargar sus fechas
+  const handleExcursionChange = async (e) => {
+    const id_excursion = e.target.value;
+
+    setReserva((prev) => ({
+      ...prev,
+      id_excursion,
+      id_fecha: "", // resetea fecha anterior
+    }));
+
+    if (id_excursion) {
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/excursiones/${id_excursion}/fechas`
+        );
+        setFechasExcursion(res.data);
+      } catch (err) {
+        console.error("Error al cargar fechas:", err);
+        Swal.fire(
+          "Error",
+          "No se pudieron cargar las fechas de esta excursión",
+          "error"
+        );
+      }
+    } else {
+      setFechasExcursion([]);
+    }
+  };
 
   // Manejar cambios de formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setReserva((prev) => ({
       ...prev,
-      [name]:
-         name === "cantidad_personas" || name === "monto_total"
-          ? Number(value)
-          : value,
+      [name]: name === "cantidad_personas" ? Number(value) : value,
     }));
   };
 
@@ -55,7 +85,14 @@ export default function CreateReserva() {
     e.preventDefault();
     setSaving(true);
     try {
-      await axios.post("http://localhost:8000/api/reservas", reserva);
+      const body = {
+        id_turista: reserva.id_turista,
+        id_fecha: reserva.id_fecha,
+        cantidad_personas: reserva.cantidad_personas,
+        estado_reserva: reserva.estado_reserva,
+      };
+
+      await axios.post("http://localhost:8000/api/reservas", body);
       Swal.fire({
         title: "Creada",
         text: "La reserva fue registrada correctamente",
@@ -95,20 +132,52 @@ export default function CreateReserva() {
           </select>
         </div>
 
+        {/* Excursión */}
+        <div className="mb-3">
+          <label className="form-label">Excursión</label>
+          <select
+            name="id_excursion"
+            value={reserva.id_excursion}
+            onChange={handleExcursionChange}
+            className="form-select"
+            required
+          >
+            <option value="">Seleccionar excursión</option>
+            {excursiones.map((e) => (
+              <option key={e.id_excursion} value={e.id_excursion}>
+                {e.titulo}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Fecha Excursión */}
         <div className="mb-3">
           <label className="form-label">Fecha de Excursión</label>
           <select
             name="id_fecha"
-            value={reserva.id_fecha || ""}
+            value={reserva.id_fecha}
             onChange={handleChange}
             className="form-select"
             required
+            disabled={!fechasExcursion.length}
           >
-            <option value="">Seleccionar fecha</option>
+            <option value="">
+              {fechasExcursion.length
+                ? "Seleccionar fecha disponible"
+                : "Seleccione una excursión primero"}
+            </option>
+
             {fechasExcursion.map((f) => (
-              <option key={f.id_fecha} value={f.id_fecha}>
-                {f.titulo} — {f.fecha ? new Date(f.fecha).toLocaleDateString() : "Fecha inválida"}
+              <option
+                key={f.id_fecha}
+                value={f.id_fecha}
+                disabled={f.cupo_disponible <= 0}
+              >
+                {new Date(f.fecha).toLocaleDateString()} —{" "}
+                {f.cupo_disponible > 0
+                  ? `Cupo disponible: ${f.cupo_disponible}`
+                  : "Sin cupo"}
               </option>
             ))}
           </select>
@@ -124,21 +193,6 @@ export default function CreateReserva() {
             onChange={handleChange}
             className="form-control"
             min="1"
-            required
-          />
-        </div>
-
-        {/* Monto total */}
-        <div className="mb-3">
-          <label className="form-label">Monto Total</label>
-          <input
-            type="number"
-            name="monto_total"
-            value={reserva.monto_total}
-            onChange={handleChange}
-            className="form-control"
-            step="0.01"
-            min="0"
             required
           />
         </div>
