@@ -14,42 +14,40 @@ export default function CreateExcursion() {
     politicas: "",
     estado: "activa",
     id_categoria_excursion: "",
-    id_guia: "", // ✅ nuevo campo
+    id_guia: "", // ✅ Guía asignado
   });
 
-  const [imagen, setImagen] = useState(null);
+  const [urlImagen, setUrlImagen] = useState(""); // 👈 ahora manejamos una URL
   const [categorias, setCategorias] = useState([]);
-  const [guias, setGuias] = useState([]); // ✅ lista de guías
+  const [guias, setGuias] = useState([]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleImageChange = (e) => {
-    setImagen(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // 1️⃣ Crear excursión
       const res = await axios.post("http://localhost:8000/api/excursiones", form);
       const id_excursion = res.data.id;
 
-      if (imagen) {
-        const formData = new FormData();
-        formData.append("imagen", imagen);
-        formData.append("id_excursion", id_excursion);
-        formData.append("tipo", "foto");
-
-        await axios.post("http://localhost:8000/api/multimedia", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+      // 2️⃣ Si hay una URL cargada, crear multimedia
+      if (urlImagen.trim() !== "") {
+        await axios.post("http://localhost:8000/api/excursiones/multimedia", {
+          id_excursion,
+          url: urlImagen,
+          descripcion: "Imagen principal de la excursión",
+          tipo: "foto",
         });
       }
 
+      alert("Excursión creada correctamente ✅");
       navigate("/dashboard-admin/excursiones");
     } catch (err) {
       console.error("Error al crear excursión:", err);
+      alert("Error al crear excursión ❌");
     }
   };
 
@@ -82,42 +80,104 @@ export default function CreateExcursion() {
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Título</label>
-          <input type="text" name="titulo" className="form-control" value={form.titulo} onChange={handleChange} required />
+          <input
+            type="text"
+            name="titulo"
+            className="form-control"
+            value={form.titulo}
+            onChange={handleChange}
+            required
+          />
         </div>
+
         <div className="mb-3">
           <label className="form-label">Ubicación</label>
-          <input type="text" name="ubicacion" className="form-control" value={form.ubicacion} onChange={handleChange} />
+          <input
+            type="text"
+            name="ubicacion"
+            className="form-control"
+            value={form.ubicacion}
+            onChange={handleChange}
+          />
         </div>
+
         <div className="mb-3">
           <label className="form-label">Precio Base</label>
-          <input type="number" name="precio_base" className="form-control" value={form.precio_base} onChange={handleChange} required />
+          <input
+            type="number"
+            name="precio_base"
+            className="form-control"
+            value={form.precio_base}
+            onChange={handleChange}
+            required
+          />
         </div>
+
         <div className="mb-3">
           <label className="form-label">Duración</label>
-          <input type="text" name="duracion" className="form-control" value={form.duracion} onChange={handleChange} />
+          <input
+            type="text"
+            name="duracion"
+            className="form-control"
+            value={form.duracion}
+            onChange={handleChange}
+          />
         </div>
+
         <div className="mb-3">
           <label className="form-label">Incluye</label>
-          <textarea name="incluye" className="form-control" rows={2} value={form.incluye} onChange={handleChange} />
+          <textarea
+            name="incluye"
+            className="form-control"
+            rows={2}
+            value={form.incluye}
+            onChange={handleChange}
+          />
         </div>
+
         <div className="mb-3">
           <label className="form-label">Políticas</label>
-          <textarea name="politicas" className="form-control" rows={2} value={form.politicas} onChange={handleChange} />
+          <textarea
+            name="politicas"
+            className="form-control"
+            rows={2}
+            value={form.politicas}
+            onChange={handleChange}
+          />
         </div>
+
         <div className="mb-3">
           <label className="form-label">Descripción</label>
-          <textarea name="descripcion" className="form-control" rows={4} value={form.descripcion} onChange={handleChange} />
+          <textarea
+            name="descripcion"
+            className="form-control"
+            rows={4}
+            value={form.descripcion}
+            onChange={handleChange}
+          />
         </div>
+
         <div className="mb-3">
           <label className="form-label">Estado</label>
-          <select name="estado" className="form-select" value={form.estado} onChange={handleChange}>
+          <select
+            name="estado"
+            className="form-select"
+            value={form.estado}
+            onChange={handleChange}
+          >
             <option value="activa">Activa</option>
             <option value="inactiva">Inactiva</option>
           </select>
         </div>
+
         <div className="mb-3">
           <label className="form-label">Categoría</label>
-          <select name="id_categoria_excursion" className="form-select" value={form.id_categoria_excursion} onChange={handleChange}>
+          <select
+            name="id_categoria_excursion"
+            className="form-select"
+            value={form.id_categoria_excursion}
+            onChange={handleChange}
+          >
             <option value="">Seleccionar categoría</option>
             {categorias.map((cat) => (
               <option key={cat.id_categoria_excursion} value={cat.id_categoria_excursion}>
@@ -126,9 +186,15 @@ export default function CreateExcursion() {
             ))}
           </select>
         </div>
+
         <div className="mb-3">
           <label className="form-label">Guía asignado</label>
-          <select name="id_guia" className="form-select" value={form.id_guia} onChange={handleChange}>
+          <select
+            name="id_guia"
+            className="form-select"
+            value={form.id_guia}
+            onChange={handleChange}
+          >
             <option value="">Seleccionar guía</option>
             {guias.map((g) => (
               <option key={g.id_usuario} value={g.id_usuario}>
@@ -137,11 +203,25 @@ export default function CreateExcursion() {
             ))}
           </select>
         </div>
+
+        {/* 👇 Campo de URL de imagen (reemplaza el input file) */}
         <div className="mb-3">
-          <label className="form-label">Imagen principal</label>
-          <input type="file" className="form-control" accept="image/*" onChange={handleImageChange} />
+          <label className="form-label">URL de imagen principal</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="https://tuservidor.com/imagenes/excursion.jpg"
+            value={urlImagen}
+            onChange={(e) => setUrlImagen(e.target.value)}
+          />
+          <small className="text-muted">
+            Pegá la URL de la imagen principal de la excursión (por ahora solo una).
+          </small>
         </div>
-        <button type="submit" className="btn btn-success">Crear excursión</button>
+
+        <button type="submit" className="btn btn-success">
+          Crear excursión
+        </button>
       </form>
     </div>
   );

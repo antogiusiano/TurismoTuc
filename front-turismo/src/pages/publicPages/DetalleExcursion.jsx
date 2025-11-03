@@ -9,7 +9,8 @@ import ExcursionMap from "../../Components/publicComponents/DetalleExcursion/Exc
 import ExcursionGallery from "../../Components/publicComponents/DetalleExcursion/ExcursionGallery";
 import ExcursionSidebar from "../../Components/publicComponents/DetalleExcursion/ExcursionSidebar";
 
-import "../../styles/publicComponents/detalleex.css"
+import "../../styles/publicComponents/detalleex.css";
+
 export default function DetalleExcursion() {
   const { id } = useParams();
   const [excursion, setExcursion] = useState(null);
@@ -19,8 +20,17 @@ export default function DetalleExcursion() {
   useEffect(() => {
     const fetchExcursion = async () => {
       try {
+        // 1) datos principales
         const res = await axios.get(`http://localhost:8000/api/excursiones/${id}`);
-        setExcursion(res.data);
+        const excursionData = res.data;
+
+        // 2) imágenes asociadas (de la tabla Multimedia)
+        const resImgs = await axios.get(
+          `http://localhost:8000/api/excursiones/${id}/multimedia`
+        );
+        excursionData.imagenes = resImgs.data || [];
+
+        setExcursion(excursionData);
       } catch (err) {
         console.error("Error al obtener excursión:", err);
         setError("No se pudo cargar la información de la excursión.");
@@ -61,18 +71,20 @@ export default function DetalleExcursion() {
   return (
     <div className="detalle-excursion-page bg-light py-4">
       <Container>
-        {/* Hero principal */}
-        <ExcursionHero excursion={excursion} />
+        {/* Hero principal (imagen grande arriba) */}
+        <ExcursionHero excursion={excursion} imagenes={excursion.imagenes} />
 
         <Row className="mt-4">
-          {/* Columna izquierda: Tabs, Mapa, Galería */}
+          {/* Columna izquierda: texto, tabs, mapa, galería */}
           <Col xs={12} md={8} lg={9} className="mb-4">
             <ExcursionTabs excursion={excursion} />
             <ExcursionMap excursion={excursion} />
+
+            {/* Galería inferior con carrusel */}
             <ExcursionGallery excursion={excursion} />
           </Col>
 
-          {/* Columna derecha: Sidebar */}
+          {/* Columna derecha: precios, reserva, fechas */}
           <Col xs={12} md={4} lg={3}>
             <ExcursionSidebar excursion={excursion} />
           </Col>

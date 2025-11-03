@@ -6,6 +6,9 @@ import {
   updateExcursion,
   deleteExcursion,
   updateCategoriaExcursion,
+  getMultimediaByExcursion,
+  createMultimedia, 
+  deleteMultimedia,
   getCategoriasExcursion,
   getFechasByExcursion,
   createFechaExcursion,
@@ -37,6 +40,10 @@ router.get("/:id", getExcursionById);
 // MULTIMEDIA
 // =============================
 
+
+router.get("/:id_excursion/multimedia", getMultimediaByExcursion);
+router.post("/multimedia", createMultimedia);
+router.delete("/multimedia/:id", deleteMultimedia);
 
 
 // =============================
