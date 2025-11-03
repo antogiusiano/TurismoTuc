@@ -26,7 +26,7 @@ export default function MainExcursiones() {
       const res = await axios.delete(`http://localhost:8000/api/excursiones/${id}`);
       setMensaje(res.data.message);
       setError("");
-      fetchExcursiones(); // recarga la lista
+      fetchExcursiones();
     } catch (err) {
       console.error("Error al eliminar excursión:", err);
       setError("No se pudo eliminar la excursión.");
@@ -63,7 +63,8 @@ export default function MainExcursiones() {
               <th>Ubicación</th>
               <th>Precio</th>
               <th>Estado</th>
-              <th>Categorías</th> {/* ✅ NUEVO */}
+              <th>Categorías</th>
+              <th>Guía</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -76,7 +77,7 @@ export default function MainExcursiones() {
                   <td>{e.ubicacion}</td>
                   <td>${e.precio_base}</td>
                   <td>
-                    <span className={`badge ${e.estado === 'Activa' ? 'bg-success' : 'bg-warning'}`}>
+                    <span className={`badge ${e.estado === 'activa' ? 'bg-success' : 'bg-warning'}`}>
                       {e.estado}
                     </span>
                   </td>
@@ -89,6 +90,19 @@ export default function MainExcursiones() {
                       ))
                     ) : (
                       <span className="text-muted">Sin categoría</span>
+                    )}
+                  </td>
+                  <td>
+                    {e.nombre_guia ? (
+                      <span
+                        className="text-primary text-decoration-underline"
+                        role="button"
+                        onClick={() => navigate(`/dashboard-admin/usuarios/view/${e.id_guia}`)}
+                      >
+                        {e.nombre_guia} {e.apellido_guia}
+                      </span>
+                    ) : (
+                      <span className="text-muted">Sin guía</span>
                     )}
                   </td>
                   <td>
@@ -122,7 +136,7 @@ export default function MainExcursiones() {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center text-muted py-3">
+                <td colSpan="8" className="text-center text-muted py-3">
                   No hay excursiones registradas
                 </td>
               </tr>

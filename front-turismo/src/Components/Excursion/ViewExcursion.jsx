@@ -39,9 +39,28 @@ export default function ViewExcursion() {
       <div className="mb-3"><strong>Ubicación:</strong> {excursion.ubicacion}</div>
       <div className="mb-3"><strong>Precio base:</strong> ${excursion.precio_base}</div>
       <div className="mb-3"><strong>Estado:</strong> {excursion.estado}</div>
-      <div className="mb-3"><strong>Descripción:</strong><p>{excursion.descripcion}</p></div>
 
-      {/* ✅ Mostrar categorías */}
+      {/* ✅ Guía asignado con enlace */}
+      <div className="mb-3">
+        <strong>Guía asignado:</strong>{" "}
+        {excursion.nombre_guia ? (
+          <span
+            className="text-primary text-decoration-underline"
+            role="button"
+            onClick={() => navigate(`/dashboard-admin/usuarios/view/${excursion.id_guia}`)}
+          >
+            {excursion.nombre_guia} {excursion.apellido_guia}
+          </span>
+        ) : (
+          <span className="text-muted">Sin guía</span>
+        )}
+      </div>
+
+      <div className="mb-3">
+        <strong>Descripción:</strong>
+        <p>{excursion.descripcion}</p>
+      </div>
+
       <div className="mb-3">
         <strong>Categorías:</strong>{" "}
         {excursion.categorias?.length > 0 ? (
