@@ -30,6 +30,13 @@ router.put("/:id", updateExcursion);
 router.delete("/:id", deleteExcursion);
 router.get("/:id", getExcursionById);
 
+
+// =============================
+// MULTIMEDIA
+// =============================
+
+
+
 // =============================
 // Rutas de Fechas de Excursión
 // =============================

@@ -360,3 +360,5 @@ export const deleteFechaExcursion = (req, res) => {
     res.json({ message: "Fecha eliminada (baja lógica) correctamente" });
   });
 };
+
+
