@@ -24,7 +24,7 @@ router.delete("/:id", deleteExcursion);
 // ====== FECHAS DE EXCURSIÓN ======
 router.get("/:id_excursion/fechas", getFechasByExcursion);
 router.post("/fechas-excursion", createFechaExcursion);
-router.put("/fechas/:id", updateFechaExcursion); // ← faltaba esta
+router.put("/fechas/:id", updateFechaExcursion);
 router.delete("/fechas/:id", deleteFechaExcursion);
 
 export default router;

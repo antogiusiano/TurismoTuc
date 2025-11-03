@@ -100,16 +100,16 @@ export const getReservaById = (req, res) => {
 
 // Crear nueva reserva
 export const createReserva = (req, res) => {
-  const { id_fecha, id_turista, cantidad_personas, monto_total } = req.body;
+  const { id_fecha, id_turista, cantidad_personas, monto_total, estado_reserva } = req.body;
 
   if (!id_fecha || !id_turista || !cantidad_personas || !monto_total)
     return res.status(400).json({ message: "Faltan datos obligatorios" });
 
   const sql = `
-    INSERT INTO Reservas (id_fecha, id_turista, cantidad_personas, monto_total)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO Reservas (id_fecha, id_turista, cantidad_personas, monto_total, estado_reserva)
+    VALUES (?, ?, ?, ?, ?)
   `;
-  const values = [id_fecha, id_turista, cantidad_personas, monto_total];
+  const values = [id_fecha, id_turista, cantidad_personas, monto_total, estado_reserva || "pendiente"];
 
   pool.query(sql, values, (err, result) => {
     if (err) {
