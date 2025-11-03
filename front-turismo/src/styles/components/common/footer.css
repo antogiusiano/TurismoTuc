@@ -1,0 +1,56 @@
+:root {
+  --color-teal: #0e7667;
+  --color-teal-dark: #083d37;
+  --color-bg-light: #f8f9fa;
+}
+
+/* Fondo principal */
+.bg-teal {
+  background-color: var(--color-teal) !important;
+}
+
+/* Texto */
+.footer {
+  width: 100%;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+/* Enlaces */
+.footer a {
+  color: #ffffffcc;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer a:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Separador */
+.footer hr {
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Botón WhatsApp */
+.footer .btn-outline-light {
+  border-color: #ffffffcc;
+  color: #fff;
+  transition: all 0.2s ease;
+}
+
+.footer .btn-outline-light:hover {
+  background-color: #fff;
+  color: var(--color-teal);
+}
+
+/* Responsive ajustes */
+@media (max-width: 768px) {
+  .footer {
+    text-align: center;
+  }
+  .footer .col-md-4 {
+    margin-bottom: 1rem;
+  }
+}

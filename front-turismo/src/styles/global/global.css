@@ -1,0 +1,57 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa; /* fondo gris claro */
+  color: #212529; /* texto oscuro */
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Asegura que el contenido no quede pegado al borde */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== NAVBAR AJUSTES ===== */
+.navbar {
+  z-index: 1000;
+}
+
+.navbar .nav-link {
+  font-weight: 500;
+  color: #212529 !important;
+}
+
+.navbar .nav-link.active {
+  color: #0e7667 !important;
+  border-bottom: 2px solid #0e7667;
+}
+
+.btn-teal {
+  background-color: #0e7667 !important;
+  border: none;
+  color: white !important;
+}
+
+.btn-teal:hover {
+  background-color: #0b5c55 !important;
+}
+
+/* Logo */
+.logo-circle {
+  width: 25px;
+  height: 25px;
+  background-color: #0e7667;
+  border-radius: 50%;
+}
+
+/* ===== FOOTER AJUSTES (por si lo agregas) ===== */
+footer {
+  background-color: #f8f9fa;
+  color: #212529;
+  text-align: center;
+  padding: 1rem;
+  margin-top: auto;
+}
