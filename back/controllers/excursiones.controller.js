@@ -143,6 +143,31 @@ export const deleteExcursion = (req, res) => {
 // FECHAS DE EXCURSIÓN
 // =============================
 
+
+// obtener todas las fechas de todas la excursiones
+export const getTodasLasFechasExcursion = (req, res) => {
+  const sql = `
+    SELECT 
+      f.id_fecha,
+      f.fecha,
+      f.hora_salida,
+      f.cupo_disponible,
+      e.titulo,
+      e.precio_base
+    FROM FechasExcursion f
+    JOIN Excursiones e ON f.id_excursion = e.id_excursion
+    WHERE f.eliminado = 0 AND e.eliminado = 0
+    ORDER BY f.fecha ASC
+  `;
+
+  pool.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error al obtener todas las fechas:", err);
+      return res.status(500).json({ message: "Error al obtener fechas de excursión" });
+    }
+    res.json(results);
+  });
+};
 // Obtener todas las fechas para una excursión específica
 export const getFechasByExcursion = (req, res) => {
   const { id_excursion } = req.params;
