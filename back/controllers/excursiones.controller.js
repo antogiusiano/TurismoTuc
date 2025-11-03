@@ -11,8 +11,10 @@ export const getExcursiones = (req, res) => {
   let sql = `
     SELECT e.id_excursion, e.titulo, e.descripcion, e.precio_base, e.duracion,
            e.ubicacion, e.incluye, e.politicas, e.estado, e.fecha_creacion,
+           e.id_guia, u.nombre AS nombre_guia, u.apellido AS apellido_guia,
            c.id_categoria_excursion, c.nombre_categoria
     FROM Excursiones e
+    LEFT JOIN Usuarios u ON e.id_guia = u.id_usuario
     LEFT JOIN ExcursionCategorias ec ON e.id_excursion = ec.id_excursion
     LEFT JOIN CategoriasExcursion c ON ec.id_categoria_excursion = c.id_categoria_excursion
     WHERE e.eliminado = 0
@@ -71,6 +73,9 @@ export const getExcursiones = (req, res) => {
           politicas: row.politicas,
           estado: row.estado,
           fecha_creacion: row.fecha_creacion,
+          id_guia: row.id_guia,
+          nombre_guia: row.nombre_guia,
+          apellido_guia: row.apellido_guia,
           categorias: [],
         };
       }
@@ -85,16 +90,16 @@ export const getExcursiones = (req, res) => {
     res.json(Object.values(agrupadas));
   });
 };
-
-// Obtener una excursión por ID con sus categorías
 export const getExcursionById = (req, res) => {
   const { id } = req.params;
 
   const sql = `
     SELECT e.id_excursion, e.titulo, e.descripcion, e.precio_base, e.duracion,
            e.ubicacion, e.incluye, e.politicas, e.estado, e.fecha_creacion,
+           e.id_guia, u.nombre AS nombre_guia, u.apellido AS apellido_guia,
            c.id_categoria_excursion, c.nombre_categoria
     FROM Excursiones e
+    LEFT JOIN Usuarios u ON e.id_guia = u.id_usuario
     LEFT JOIN ExcursionCategorias ec ON e.id_excursion = ec.id_excursion
     LEFT JOIN CategoriasExcursion c ON ec.id_categoria_excursion = c.id_categoria_excursion
     WHERE e.id_excursion = ? AND e.eliminado = 0
@@ -119,6 +124,9 @@ export const getExcursionById = (req, res) => {
       politicas: results[0].politicas,
       estado: results[0].estado,
       fecha_creacion: results[0].fecha_creacion,
+      id_guia: results[0].id_guia,
+      nombre_guia: results[0].nombre_guia,
+      apellido_guia: results[0].apellido_guia,
       categorias: [],
     };
 
@@ -135,18 +143,28 @@ export const getExcursionById = (req, res) => {
   });
 };
 
-// Crear una nueva excursión con categoría
+
 export const createExcursion = (req, res) => {
-  const { titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas, id_categoria_excursion } = req.body;
+  const {
+    titulo,
+    descripcion,
+    precio_base,
+    duracion,
+    ubicacion,
+    incluye,
+    politicas,
+    id_categoria_excursion,
+    id_guia, // ✅ nuevo campo
+  } = req.body;
 
   if (!titulo || !precio_base)
     return res.status(400).json({ message: "Faltan datos obligatorios" });
 
   const sql = `INSERT INTO Excursiones 
-              (titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas)
-               VALUES (?, ?, ?, ?, ?, ?, ?)`;
+              (titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas, id_guia)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`; // ✅ agregamos id_guia
 
-  const values = [titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas];
+  const values = [titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas, id_guia];
 
   pool.query(sql, values, (err, result) => {
     if (err) {
@@ -174,14 +192,24 @@ export const createExcursion = (req, res) => {
 // Actualizar una excursión existente
 export const updateExcursion = (req, res) => {
   const { id } = req.params;
-  const { titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas, estado } = req.body;
+  const {
+    titulo,
+    descripcion,
+    precio_base,
+    duracion,
+    ubicacion,
+    incluye,
+    politicas,
+    estado,
+    id_guia, // ✅ nuevo campo
+  } = req.body;
 
   const sql = `UPDATE Excursiones
                SET titulo=?, descripcion=?, precio_base=?, duracion=?, ubicacion=?, 
-                   incluye=?, politicas=?, estado=?
+                   incluye=?, politicas=?, estado=?, id_guia=?
                WHERE id_excursion=? AND eliminado=0`;
 
-  const values = [titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas, estado, id];
+  const values = [titulo, descripcion, precio_base, duracion, ubicacion, incluye, politicas, estado, id_guia, id];
 
   pool.query(sql, values, (err, result) => {
     if (err) {
@@ -361,4 +389,20 @@ export const deleteFechaExcursion = (req, res) => {
   });
 };
 
+export const getGuias = (req, res) => {
+  const sql = `
+    SELECT id_usuario, nombre, apellido
+    FROM Usuarios
+    WHERE id_rol = (
+      SELECT id_rol FROM Roles WHERE nombre_rol = 'Guía turístico'
+    ) AND estado = 'activo'
+  `;
 
+  pool.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error al obtener guías turísticos:", err);
+      return res.status(500).json({ message: "Error al obtener guías turísticos" });
+    }
+    res.json(results);
+  });
+};

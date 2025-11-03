@@ -9,6 +9,7 @@ export default function EditExcursion() {
   const [excursion, setExcursion] = useState(null);
   const [imagenes, setImagenes] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [guias, setGuias] = useState([]); // ✅ nuevo estado
 
   useEffect(() => {
     const fetchData = async () => {
@@ -17,14 +18,16 @@ export default function EditExcursion() {
         const data = resExc.data;
 
         const id_categoria_excursion = data.categorias?.[0]?.id_categoria_excursion || "";
-        setExcursion({ ...data, id_categoria_excursion });
+        setExcursion({ ...data, id_categoria_excursion, id_guia: data.id_guia || "" });
 
         const resImgs = await axios.get(`http://localhost:8000/api/multimedia/excursion/${id}`);
         setImagenes(resImgs.data);
 
-        // ✅ Endpoint corregido
         const resCats = await axios.get("http://localhost:8000/api/excursiones/categorias-excursion");
         setCategorias(resCats.data);
+
+        const resGuias = await axios.get("http://localhost:8000/api/excursiones/guias");
+        setGuias(resGuias.data);
       } catch (err) {
         console.error("Error al cargar datos:", err);
       }
@@ -110,6 +113,17 @@ export default function EditExcursion() {
             {categorias.map((cat) => (
               <option key={cat.id_categoria_excursion} value={cat.id_categoria_excursion}>
                 {cat.nombre_categoria}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-3">
+          <label className="form-label">Guía asignado</label>
+          <select name="id_guia" className="form-select" value={excursion.id_guia} onChange={handleChange}>
+            <option value="">Seleccionar guía</option>
+            {guias.map((g) => (
+              <option key={g.id_usuario} value={g.id_usuario}>
+                {g.nombre} {g.apellido}
               </option>
             ))}
           </select>

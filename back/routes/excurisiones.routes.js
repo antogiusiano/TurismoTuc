@@ -11,6 +11,7 @@ import {
   createFechaExcursion,
   updateFechaExcursion,
   deleteFechaExcursion,
+  getGuias,
 } from "../controllers/excursiones.controller.js";
 
 const router = express.Router();
@@ -22,6 +23,7 @@ const router = express.Router();
 // 🔹 Primero las rutas específicas
 router.get("/categorias-excursion", getCategoriasExcursion);
 router.post("/categoria", updateCategoriaExcursion);
+router.get("/guias", getGuias);
 
 // 🔹 Luego las rutas dinámicas
 router.get("/", getExcursiones);
