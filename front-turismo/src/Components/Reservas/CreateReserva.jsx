@@ -85,14 +85,7 @@ export default function CreateReserva() {
     e.preventDefault();
     setSaving(true);
     try {
-      const body = {
-        id_turista: reserva.id_turista,
-        id_fecha: reserva.id_fecha,
-        cantidad_personas: reserva.cantidad_personas,
-        estado_reserva: reserva.estado_reserva,
-      };
-
-      await axios.post("http://localhost:8000/api/reservas", body);
+      await axios.post("http://localhost:8000/api/reservas", reserva);
       Swal.fire({
         title: "Creada",
         text: "La reserva fue registrada correctamente",
@@ -100,6 +93,16 @@ export default function CreateReserva() {
         timer: 2000,
         showConfirmButton: false,
       });
+
+      // Actualizar cupo en el estado de fechas
+      setFechasExcursion((prev) =>
+        prev.map((f) =>
+          f.id_fecha === reserva.id_fecha
+            ? { ...f, cupo_disponible: res.data.nuevoCupo }
+            : f
+        )
+      );
+
       navigate("/dashboard-admin/reservas");
     } catch (err) {
       console.error(err);
