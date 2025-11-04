@@ -6,11 +6,15 @@ import {
   updateExcursion,
   deleteExcursion,
   updateCategoriaExcursion,
+  getMultimediaByExcursion,
+  createMultimedia, 
+  deleteMultimedia,
   getCategoriasExcursion,
   getFechasByExcursion,
   createFechaExcursion,
   updateFechaExcursion,
   deleteFechaExcursion,
+  getGuias,
 } from "../controllers/excursiones.controller.js";
 
 const router = express.Router();
@@ -22,6 +26,7 @@ const router = express.Router();
 // 🔹 Primero las rutas específicas
 router.get("/categorias-excursion", getCategoriasExcursion);
 router.post("/categoria", updateCategoriaExcursion);
+router.get("/guias", getGuias);
 
 // 🔹 Luego las rutas dinámicas
 router.get("/", getExcursiones);
@@ -29,6 +34,17 @@ router.post("/", createExcursion);
 router.put("/:id", updateExcursion);
 router.delete("/:id", deleteExcursion);
 router.get("/:id", getExcursionById);
+
+
+// =============================
+// MULTIMEDIA
+// =============================
+
+
+router.get("/:id_excursion/multimedia", getMultimediaByExcursion);
+router.post("/multimedia", createMultimedia);
+router.delete("/multimedia/:id", deleteMultimedia);
+
 
 // =============================
 // Rutas de Fechas de Excursión

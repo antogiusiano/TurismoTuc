@@ -12,14 +12,26 @@ export default function ViewExcursion() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // 1) excursión
         const resExc = await axios.get(`http://localhost:8000/api/excursiones/${id}`);
         setExcursion(resExc.data);
 
-        const resFechas = await axios.get(`http://localhost:8000/api/excursiones/${id}/fechas`);
-        setFechas(resFechas.data);
+        // si el backend ya mandó imágenes, las uso
+        if (Array.isArray(resExc.data.imagenes)) {
+          setImagenes(resExc.data.imagenes);
+        } else {
+          // 2) si no, las pido al endpoint correcto
+          const resImgs = await axios.get(
+            `http://localhost:8000/api/excursiones/${id}/multimedia`
+          );
+          setImagenes(resImgs.data);
+        }
 
-        const resImgs = await axios.get(`http://localhost:8000/api/multimedia/excursion/${id}`);
-        setImagenes(resImgs.data);
+        // 3) fechas
+        const resFechas = await axios.get(
+          `http://localhost:8000/api/excursiones/${id}/fechas`
+        );
+        setFechas(resFechas.data);
       } catch (err) {
         console.error("Error al cargar datos:", err);
       }
@@ -33,15 +45,35 @@ export default function ViewExcursion() {
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h4 className="fw-bold">{excursion.titulo}</h4>
-        <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate(-1)}>← Volver</button>
+        <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate(-1)}>
+          ← Volver
+        </button>
       </div>
 
       <div className="mb-3"><strong>Ubicación:</strong> {excursion.ubicacion}</div>
       <div className="mb-3"><strong>Precio base:</strong> ${excursion.precio_base}</div>
       <div className="mb-3"><strong>Estado:</strong> {excursion.estado}</div>
-      <div className="mb-3"><strong>Descripción:</strong><p>{excursion.descripcion}</p></div>
 
-      {/* ✅ Mostrar categorías */}
+      <div className="mb-3">
+        <strong>Guía asignado:</strong>{" "}
+        {excursion.nombre_guia ? (
+          <span
+            className="text-primary text-decoration-underline"
+            role="button"
+            onClick={() => navigate(`/dashboard-admin/usuarios/view/${excursion.id_guia}`)}
+          >
+            {excursion.nombre_guia} {excursion.apellido_guia}
+          </span>
+        ) : (
+          <span className="text-muted">Sin guía</span>
+        )}
+      </div>
+
+      <div className="mb-3">
+        <strong>Descripción:</strong>
+        <p>{excursion.descripcion}</p>
+      </div>
+
       <div className="mb-3">
         <strong>Categorías:</strong>{" "}
         {excursion.categorias?.length > 0 ? (
@@ -55,13 +87,28 @@ export default function ViewExcursion() {
         )}
       </div>
 
+      {/* Galería */}
       {imagenes.length > 0 && (
         <div className="mb-4">
-          <h6 className="fw-bold">Imágenes</h6>
+          <h5 className="fw-bold">Galería</h5>
           <div className="d-flex flex-wrap gap-3">
             {imagenes.map((img) => (
-              <div key={img.id_multimedia}>
-                <img src={img.url} alt="Imagen" className="img-thumbnail" style={{ maxHeight: "200px" }} />
+              <div
+                key={img.id_multimedia}
+                className="card shadow-sm"
+                style={{ width: "180px", borderRadius: "10px", overflow: "hidden" }}
+              >
+                <img
+                  src={img.url}
+                  alt={img.descripcion || "Imagen de excursión"}
+                  className="card-img-top"
+                  style={{ height: "120px", objectFit: "cover" }}
+                />
+                <div className="card-body p-2 text-center">
+                  <small className="text-muted">
+                    { "Imagen de excursión"}
+                  </small>
+                </div>
               </div>
             ))}
           </div>
