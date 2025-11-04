@@ -139,8 +139,8 @@ export const getReservasByTurista = (req, res) => {
 
   pool.query(sql, [id], (err, results) => {
     if (err) {
-      console.error("❌ Error al obtener reservas del turista:", err.sqlMessage);
-      return res.status(500).json({ message: "Error al obtener reservas del turista", error: err.sqlMessage });
+      console.error("Error al obtener reservas del turista:", err.message);
+      return res.status(500).json({ message: "Error al obtener reservas del turista", error: err.message });
     }
     res.json(results);
   });
