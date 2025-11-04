@@ -7,7 +7,7 @@ import { pool } from "../config/DB.js";
 
 // Obtener las reservas con información relacionada y filtro
 export const getReservas = (req, res) => {
-  console.log("Query recibida:", req.query);
+  //console.log("Query recibida:", req.query);
 
   const { filtro, estadoreserva, fechaDesde, fechaHasta } = req.query;
   const condiciones = [];
@@ -32,7 +32,7 @@ export const getReservas = (req, res) => {
     condiciones.push(`DATE(r.fecha_reserva) <= '${fechaHasta}'`);
   }
 
-  console.log("Condiciones generadas:", condiciones);
+  //console.log("Condiciones generadas:", condiciones);
 
   const whereClause =
     condiciones.length > 0 ? `WHERE ${condiciones.join(" AND ")}` : "";
@@ -40,6 +40,7 @@ export const getReservas = (req, res) => {
   const sql = `
     SELECT 
       r.id_reserva, 
+      t.dni as dni_turista,
       CONCAT(t.nombre, ' ', t.apellido) AS turista,
       e.titulo AS excursion,
       f.fecha AS fecha_excursion,
@@ -56,7 +57,7 @@ export const getReservas = (req, res) => {
     ORDER BY r.fecha_reserva DESC;
   `;
 
-  console.log("SQL generada:", sql);
+  //console.log("SQL generada:", sql);
 
   pool.query(sql, (err, results) => {
     if (err) {
@@ -72,8 +73,13 @@ export const getReservaById = (req, res) => {
   const { id } = req.params;
   const sql = `
     SELECT 
-      r.id_reserva, 
-      CONCAT(t.nombre, ' ', t.apellido) AS turista,
+      r.id_reserva,
+      r.id_turista,
+      r.id_fecha, 
+      COALESCE(t.nombre, '') AS nombre,
+      COALESCE(t.apellido, '') AS apellido,
+      COALESCE(t.dni, '') AS dni,
+      e.id_excursion,
       e.titulo AS excursion,
       f.fecha AS fecha_excursion,
       r.cantidad_personas,
@@ -92,9 +98,25 @@ export const getReservaById = (req, res) => {
       console.error("Error al obtener reserva:", err);
       return res.status(500).json({ message: "Error al obtener reserva" });
     }
-    if (results.length === 0)
+    if (results.length === 0) {
       return res.status(404).json({ message: "Reserva no encontrada" });
-    res.json(results[0]);
+    }
+
+    const reserva = results[0];
+    res.json({
+      id_reserva: reserva.id_reserva,
+      id_turista: reserva.id_turista,
+      id_fecha: reserva.id_fecha,
+      id_excursion: reserva.id_excursion,
+      cantidad_personas: reserva.cantidad_personas,
+      monto_total: reserva.monto_total,
+      estado_reserva: reserva.estado_reserva,
+      fecha_reserva: reserva.fecha_reserva,
+      excursion: reserva.excursion,
+      fecha_excursion: reserva.fecha_excursion,
+      turista: `${reserva.nombre ?? ""}  ${reserva.apellido ?? ""}`.trim(),
+      dni: reserva.dni,
+    });
   });
 };
 
@@ -181,24 +203,63 @@ export const createReserva = (req, res) => {
 // Actualizar estado o datos de una reserva
 export const updateReserva = (req, res) => {
   const { id } = req.params;
-  const { cantidad_personas, monto_total, estado_reserva } = req.body;
+  const {
+    id_fecha,
+    id_excursion,
+    cantidad_personas,
+    monto_total,
+    estado_reserva,
+  } = req.body;
 
+  // Validaciones simples
+  if (!id_fecha || !cantidad_personas || !estado_reserva) {
+    return res.status(400).json({ message: "Faltan datos obligatorios" });
+  }
+
+  // Actualizar los datos principales de la reserva
   const sql = `
     UPDATE Reservas
-    SET cantidad_personas=?, monto_total=?, estado_reserva=?
-    WHERE id_reserva=? AND eliminado=0
+    SET id_fecha = ?, cantidad_personas = ?, monto_total = ?, estado_reserva = ?
+    WHERE id_reserva = ?;
   `;
-  const values = [cantidad_personas, monto_total, estado_reserva, id];
 
-  pool.query(sql, values, (err, result) => {
-    if (err) {
-      console.error("Error al actualizar reserva:", err);
-      return res.status(500).json({ message: "Error al actualizar reserva" });
+  pool.query(
+    sql,
+    [id_fecha, cantidad_personas, monto_total, estado_reserva, id],
+    (err, result) => {
+      if (err) {
+        console.error("Error al actualizar reserva:", err);
+        return res
+          .status(500)
+          .json({ message: "Error al actualizar la reserva" });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Reserva no encontrada" });
+      }
+
+      //  Si también viene id_excursion, actualizamos la relación en FechasExcursion
+      // (esto es opcional; la relación excursión-fecha normalmente se define por id_fecha)
+      if (id_excursion) {
+        const sqlExcursion = `
+          UPDATE FechasExcursion 
+          SET id_excursion = ?
+          WHERE id_fecha = ?;
+        `;
+        pool.query(sqlExcursion, [id_excursion, id_fecha], (err2) => {
+          if (err2) {
+            console.error("Error al actualizar excursión:", err2);
+            return res.status(500).json({
+              message: "Reserva actualizada, pero error en excursión",
+            });
+          }
+          res.json({ message: "Reserva actualizada correctamente" });
+        });
+      } else {
+        res.json({ message: "Reserva actualizada correctamente" });
+      }
     }
-    if (result.affectedRows === 0)
-      return res.status(404).json({ message: "Reserva no encontrada" });
-    res.json({ message: "Reserva actualizada correctamente" });
-  });
+  );
 };
 
 // Baja lógica de reserva

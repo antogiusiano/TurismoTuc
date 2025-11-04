@@ -9,12 +9,15 @@ export default function CreateReserva() {
 
   // Listas para selects
   const [turistas, setTuristas] = useState([]);
+  const [idTurista, setIdTurista] = useState("");
+  const [nombreTurista, setNombreTurista] = useState("");
   const [excursiones, setExcursiones] = useState([]);
   const [fechasExcursion, setFechasExcursion] = useState([]);
 
   const [reserva, setReserva] = useState({
     id_turista: "",
     id_fecha: "",
+    dni: "",
     cantidad_personas: 1,
     estado_reserva: "pendiente",
   });
@@ -43,6 +46,20 @@ export default function CreateReserva() {
     fetchData();
   }, []);
 
+  // ===============================
+  // Buscar turista por DNI
+  // ===============================
+  const buscarTuristaPorDNI = () => {
+    const turista = turistas.find((t) => t.dni == reserva.dni);
+    if (turista) {
+      setNombreTurista(turista.nombre_completo);
+      setReserva((prev) => ({ ...prev, id_turista: turista.id_turista }));
+    } else {
+      setNombreTurista("");
+      setReserva((prev) => ({ ...prev, id_turista: "" }));
+      Swal.fire("Atención", "No se encontró un turista con ese DNI", "warning");
+    }
+  };
   // Cuando cambia la excursión seleccionada → cargar sus fechas
   const handleExcursionChange = async (e) => {
     const id_excursion = e.target.value;
@@ -50,7 +67,7 @@ export default function CreateReserva() {
     setReserva((prev) => ({
       ...prev,
       id_excursion,
-      id_fecha: "", // resetea fecha anterior
+      id_fecha: "",
     }));
 
     if (id_excursion) {
@@ -84,6 +101,14 @@ export default function CreateReserva() {
   // Enviar al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!reserva.id_turista || !reserva.id_fecha) {
+      Swal.fire(
+        "Atención",
+        "Debe seleccionar un turista y una fecha",
+        "warning"
+      );
+      return;
+    }
     setSaving(true);
     try {
       await axios.post("http://localhost:8000/api/reservas", reserva);
@@ -104,6 +129,14 @@ export default function CreateReserva() {
         )
       );
 
+      setReserva({
+        id_turista: "",
+        id_fecha: "",
+        cantidad_personas: 1,
+        estado_reserva: "pendiente",
+      });
+      setIdTurista("");
+      setNombreTurista("");
       navigate("/dashboard-admin/reservas");
     } catch (err) {
       console.error(err);
@@ -119,21 +152,28 @@ export default function CreateReserva() {
       <form onSubmit={handleSubmit}>
         {/* Turista */}
         <div className="mb-3">
-          <label className="form-label">Turista</label>
-          <select
-            name="id_turista"
-            value={reserva.id_turista}
+          <label className="form-label">DNI del Turista</label>
+          <input
+            type="text"
+            name="dni"
+            value={reserva.dni}
             onChange={handleChange}
-            className="form-select"
+            onBlur={buscarTuristaPorDNI}
+            className="form-control"
+            placeholder="Ingrese DNI del turista"
             required
-          >
-            <option value="">Seleccionar turista</option>
-            {turistas.map((t) => (
-              <option key={t.id_turista} value={t.id_turista}>
-                {t.nombre} {t.apellido}
-              </option>
-            ))}
-          </select>
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Nombre y Apellido</label>
+          <input
+            type="text"
+            className="form-control"
+            value={nombreTurista}
+            readOnly
+            placeholder="Se completa automáticamente"
+          />
         </div>
 
         {/* Excursión */}
