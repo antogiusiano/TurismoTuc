@@ -106,7 +106,9 @@ export default function ReservasMain() {
       <Card.Body className="p-3">
         {/* Encabezado */}
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="fw-bold text-success mb-0">Gestión de Reservas</h5>
+          <h5 className="fw-bold text-success mb-0">
+            Gestión de Reservas <small className="text-muted">({estadoreserva})</small>
+          </h5>
 
           <div className="d-flex align-items-center gap-2">
             {/* Botón Crear Reserva */}
@@ -288,7 +290,8 @@ export default function ReservasMain() {
         <Table hover responsive className="align-middle">
           <thead className="table-light">
             <tr>
-              <th>ID</th>
+              {/* <th>ID</th> */}
+              <th>DNI</th>
               <th>Turista</th>
               <th>Excursión</th>
               <th>Fecha Excursión</th>
@@ -303,7 +306,8 @@ export default function ReservasMain() {
             {reservas.length > 0 ? (
               reservas.map((r) => (
                 <tr key={r.id_reserva}>
-                  <td>{r.id_reserva}</td>
+                  {/* <td>{r.id_reserva}</td> */}
+                  <td>{r.dni_turista}</td>
                   <td>{r.turista}</td>
                   <td>{r.excursion}</td>
                   <td>{new Date(r.fecha_excursion).toLocaleDateString()}</td>

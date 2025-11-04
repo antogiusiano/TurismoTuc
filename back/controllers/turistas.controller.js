@@ -8,10 +8,10 @@ import { pool } from "../config/DB.js";
 // Listar todos los turistas activos
 export const getTuristas = (req, res) => {
   const sql = `
-    SELECT id_turista, nombre, apellido, dni, email, telefono, direccion, nacionalidad
+    SELECT id_turista, nombre, apellido,CONCAT(nombre, ' ', apellido) AS nombre_completo, dni, email, telefono, direccion, nacionalidad
     FROM Turistas
     WHERE eliminado = 0
-    ORDER BY nombre ASC
+    ORDER BY dni ASC
   `;
 
   pool.query(sql, (err, results) => {

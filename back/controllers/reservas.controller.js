@@ -40,6 +40,7 @@ export const getReservas = (req, res) => {
   const sql = `
     SELECT 
       r.id_reserva, 
+      t.dni as dni_turista,
       CONCAT(t.nombre, ' ', t.apellido) AS turista,
       e.titulo AS excursion,
       f.fecha AS fecha_excursion,
