@@ -114,7 +114,7 @@ export const getReservaById = (req, res) => {
       fecha_reserva: reserva.fecha_reserva,
       excursion: reserva.excursion,
       fecha_excursion: reserva.fecha_excursion,
-      turista: `${reserva.nombre ?? ""} ${reserva.apellido ?? ""}`.trim(),
+      turista: `${reserva.nombre ?? ""}  ${reserva.apellido ?? ""}`.trim(),
       dni: reserva.dni,
     });
   });
